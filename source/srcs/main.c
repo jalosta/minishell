@@ -121,18 +121,6 @@ char **tokenize_input(char *input)
     return (tokens);
 }
 
-// void free_array(char **array)
-// {
-//     int i;
-
-//     i = 0;
-//     while (array[i])
-//     {
-//         free(i);
-//      j   i++;
-//     }
-// }
-
 int main(int ac, char **av)
 {
     char    *input;

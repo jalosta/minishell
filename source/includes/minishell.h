@@ -6,7 +6,7 @@
 /*   By: jalosta- <jalosta-@student.42.ae>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/23 10:00:11 by jalosta-          #+#    #+#             */
-/*   Updated: 2026/04/23 10:34:41 by jalosta-         ###   ########.fr       */
+/*   Updated: 2026/04/23 11:29:18 by jalosta-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@ dup, dup2, pipe, opendir, readdir, closedir,
 strerror, perror, isatty, ttyname, ttyslot, ioctl,
 getenv, tcsetattr, tcgetattr, tgetent, tgetflag,
 tgetnum, tgetstr, tgoto, tputs */
+
+#define SUCCESS 0
+#define FAILURE -1
 
 #include <fcntl.h>  // open, close
 #include <stdlib.h> // malloc, free
