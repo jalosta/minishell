@@ -1,5 +1,6 @@
 #include "minishell.h"
 
+
 // Counts the total number of words to allocate the tokens array.
 // It skips spaces inside quotes, treats operators (<, >, |, <<, >>) 
 // as separate tokens, and checks for unclosed quotes.
@@ -128,8 +129,8 @@ void free_array(char **array)
     free(array);
 }
 
-// Core lexer function. Slices the raw input string into an array of tokens.
-// Example: "ls>file" becomes ["ls", ">", "file", NULL]
+// Our lexer function. Slices the input string into an array of tokens.
+// Example -  "ls>file" becomes ["ls", ">", "file", NULL]
 char **tokenize_input(char *input)
 {
     int     words;
@@ -141,7 +142,7 @@ char **tokenize_input(char *input)
     i = 0;
     j = 0;
     words = count_words(input);
-    if (words == -1) // Check for syntax error (unclosed quotes)
+    if (words == -1) // Check for syntax error (unclosed quotes). Look at the first functions error check near the end.
         return NULL;
     tokens = malloc(sizeof(char *) * (words + 1));
     if (!tokens)
@@ -167,14 +168,96 @@ char **tokenize_input(char *input)
     return (tokens);
 }
 
-int main(int ac, char **av)
+// Creates a dynamic duplicate of the system's environment variables 
+// so we have memory space to modify them later.
+char **copy_env(char **envp)
+{
+    int     i;
+    int     count;
+    char    **new_env;
+
+    i = 0;
+    count = 0;
+    while (envp[count] != NULL)
+        count++;
+    new_env = malloc(sizeof(char *) * (count + 1));
+    if (!new_env)
+        return (NULL);
+    while (i < count)
+    {
+        new_env[i] = ft_strdup(envp[i]);
+        i++;
+    }
+    new_env[i] = NULL;
+    return (new_env);
+}
+
+// Searches our environment array for a specific variable and returns its value.
+char *get_env_value(char *var_name, char **env)
+{
+    int i;
+    int len;
+
+    i = 0;
+    len = ft_strlen(var_name); 
+    while (env[i] != NULL)
+    {
+        // We check for the '=' to create a hard boundary. This prevents false matches 
+        // like searching for "USER" and accidentally matching "USER_ID=12345".
+        if (ft_strncmp(env[i], var_name, len) == 0 && env[i][len] == '=')
+            return (env[i] + len + 1);
+        i++;
+    }
+    return (NULL);
+}
+
+// WIP: Scans a token for the '$' sign to expand environment variables.
+char *expand_token(char *token, char **env)
+{
+    int i = 0;
+    char var[100];
+    int j;
+    char *value;
+
+    while (token[i])
+    {
+        if (token[i] == '$')
+        {
+            i++;
+            j = 0;
+            // Extract the variable name. Bash variables can only contain 
+            // alpha or number characters or underscores.
+            while (token[i] && 
+                  ((token[i] >= 'a' && token[i] <= 'z') ||
+                   (token[i] >= 'A' && token[i] <= 'Z') ||
+                   (token[i] >= '0' && token[i] <= '9') ||
+                   token[i] == '_'))
+                var[j++] = token[i++];
+            var[j] = '\0';
+            value = get_env_value(var, env);
+            printf("%s -->> %s\n", var, value);
+            i--;
+        }
+        i++;
+    }
+    return token;
+}
+
+// envp acts like av, but instead of holding user typed arguments, 
+// it holds the systems background state (environment variables) .
+// We use this to find things like $USER or the PATH for executing commands.
+int main(int ac, char **av, char **envp)
 {
     char    *input;
     char    **tokens;
+    char    **my_env;
     int     i;
 
     (void)ac;
     (void)av;
+    my_env = copy_env(envp);
+    if (!my_env)
+        return 1;
     while (1)
     {
         input = readline("minishell$ ");
@@ -192,6 +275,7 @@ int main(int ac, char **av)
             {
                 while (tokens[i])
                 {
+                    tokens[i] = expand_token(tokens[i], my_env);
                     printf("Token %d: [%s]\n", i, tokens[i]);
                     i++;
                 }
