@@ -1,47 +1,60 @@
 #include "minishell.h"
 
-// Counts the total number of words in input string. 
-// Will be used for malloc.
-
+// Figures out exactly how many words are in the string so we know 
+// how big to make our main tokens array. It's smart enough to ignore 
+// spaces if they are trapped inside single or double quotes.
 int count_words(char *str)
 {
-    int count;
-    int i;
+    int     count;
+    int     i;
+    char    q;
 
     count = 0;
     i = 0;
+    q = 0;
     while (str[i] != '\0')
     {
         while (str[i] == ' ' || str[i] == '\t')
             i++;
-        if (str[i] != '\0' && str[i] != ' ' && str[i] != '\t')
+        if (str[i] != '\0')
         {
             count++;
-            while (str[i] != '\0' && str[i] != ' ' && str[i] != '\t')
+            while (str[i] != '\0' && (q != 0 || (str[i] != ' ' && str[i] != '\t')))
+            {
+                if ((str[i] == '"' || str[i] == '\'') && q == 0)
+                    q = str[i];
+                else if (q == str[i])
+                    q = 0;
                 i++;
+            }
         }
     }
     return (count);
 }
 
-// Get the number of chars in words.
-// Will helps us know how many bytes to allocate for a specific string.
-
+// Measures the exact length of a single word, respecting quotes, 
+// so we know exactly how many bytes to ask malloc for.
 int get_word_length(char *str, int i)
 {
-    int len;
+    int     len;
+    char    q;
 
     len = 0;
-    while (str[i] != '\0' && str[i] != ' ' && str[i] != '\t')
+    q = 0;
+    while (str[i] != '\0' && (q != 0 || (str[i] != ' ' && str[i] != '\t')))
     {
+        if ((str[i] == '"' || str[i] == '\'') && q == 0)
+            q = str[i];
+        else if (q == str[i])
+            q = 0;
         len++;
         i++;
     }
     return (len);
 }
 
-// Allocates memory for a single word.
-
+// Grabs memory for one specific word, copies the letters over one by one, 
+// and safely caps it off with a null terminator.
 char *allocate_word(char *str, int start, int len)
 {
     char    *word;
@@ -62,8 +75,8 @@ char *allocate_word(char *str, int start, int len)
     return (word);
 }
 
-// Basic freeing function, made to save space in the main.
-
+// Our emergency cleanup crew. If a malloc fails halfway through tokenizing, 
+// this destroys the partially built array so we don't leak memory.
 void free_tokens(char **tokens, int current_j)
 {
     int i;
@@ -77,14 +90,26 @@ void free_tokens(char **tokens, int current_j)
     free(tokens);
 }
 
-// Uses all the previous functions to 
-// slice the input string into an array of words.
+// Cleans up the final completed token array after we are done using it 
+// so we don't bleed memory every time the user types a command.
+void free_array(char **array)
+{
+    int i;
 
-// If the user types something like "-l src ls", this function will slice it into tokens, like this - ["-l", "src", "ls", NULL]
-// will be used in execeve
+    i = 0;
+    if (!array)
+        return ;
+    while (array[i])
+    {
+        free(array[i]);
+        i++;
+    }
+    free(array);
+}
 
-//execve(const char *pathname, [HERE]char **const argv, char *const envp[]);
-
+// The main engine of our lexer. It ties all the helpers together to slice up 
+// the raw user input into a clean, double-pointer array ready for the execve phase.
+// Example: "-l src ls" becomes ["-l", "src", "ls", NULL]
 char **tokenize_input(char *input)
 {
     int     words;
@@ -117,7 +142,6 @@ char **tokenize_input(char *input)
         }
     }
     tokens[j] = NULL;
-    free(input);
     return (tokens);
 }
 
@@ -141,7 +165,6 @@ int main(int ac, char **av)
         {
             add_history(input);
             tokens = tokenize_input(input);
-            
             i = 0;
             if (tokens)
             {
@@ -150,8 +173,10 @@ int main(int ac, char **av)
                     printf("Token %d: [%s]\n", i, tokens[i]);
                     i++;
                 }
+                free_array(tokens);
             }
         }
+        free(input);
     }
     return (0);
 }
