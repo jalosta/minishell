@@ -203,7 +203,7 @@ char *get_env_value(char *var_name, char **env)
     while (env[i] != NULL)
     {
         // We check for the '=' to create a hard boundary. This prevents false matches 
-        // like searching for "USER" and accidentally matching "USER_ID=12345".
+        // like searching for "USER" and accidentally matching "USER_ID=12345.""
         if (ft_strncmp(env[i], var_name, len) == 0 && env[i][len] == '=')
             return (env[i] + len + 1);
         i++;
@@ -211,36 +211,84 @@ char *get_env_value(char *var_name, char **env)
     return (NULL);
 }
 
-// WIP: Scans a token for the '$' sign to expand environment variables.
+// Makes a new string by swapping a variable with its environment value.
+// i = index of the '$'
+// j = length of the variable name
+// The prefix would be for example  "Hello " in "Hello $USER".
+// The suffix would be for example  "!" in "Hello $USER!".
+char *replace_string(char *token, char *value, int i, int j)
+{
+    int     prefix_len;
+    int     value_len;
+    int     suffix_len;
+    char    *new_str;
+    int     k;
+    int     m;
+
+    prefix_len = i;
+    value_len = 0;
+    k = 0;
+    m = 0;
+    if (value)
+        value_len = ft_strlen(value);
+    suffix_len = ft_strlen(token + i + 1 + j);
+    new_str = malloc(sizeof(char) * (prefix_len + value_len + suffix_len + 1));
+    if (!new_str)
+        return (NULL);
+    while (k < prefix_len)
+    {
+        new_str[k] = token[k];
+        k++;
+    }
+    while (m < value_len)
+        new_str[k++] = value[m++];
+    m = i + 1 + j;
+    while (token[m] != '\0')
+        new_str[k++] = token[m++];
+    new_str[k] = '\0';
+    free(token);
+    return (new_str);
+}
+
+// Checks a token for the '$' sign to expand environment variables.
+// Protects the $ if it's wrapped in single quotes.
 char *expand_token(char *token, char **env)
 {
-    int i = 0;
-    char var[100];
-    int j;
-    char *value;
+    int     i = 0;
+    char    var[100];
+    int     j;
+    char    *value;
+    char    q = 0;
+    int     dollar_idx;
 
     while (token[i])
     {
-        if (token[i] == '$')
+        if ((token[i] == '"' || token[i] == '\'') && q == 0)
+            q = token[i];
+        else if (q == token[i])
+            q = 0;
+        if (token[i] == '$' && q != '\'')
         {
+            dollar_idx = i;
             i++;
             j = 0;
-            // Extract the variable name. Bash variables can only contain 
-            // alpha or number characters or underscores.
-            while (token[i] && 
-                  ((token[i] >= 'a' && token[i] <= 'z') ||
+            while (token[i] && ((token[i] >= 'a' && token[i] <= 'z') ||
                    (token[i] >= 'A' && token[i] <= 'Z') ||
-                   (token[i] >= '0' && token[i] <= '9') ||
-                   token[i] == '_'))
+                   (token[i] >= '0' && token[i] <= '9') || token[i] == '_'))
                 var[j++] = token[i++];
             var[j] = '\0';
             value = get_env_value(var, env);
-            printf("%s -->> %s\n", var, value);
-            i--;
+            token = replace_string(token, value, dollar_idx, j);
+            if (!token)
+                return (NULL);
+            if (value)
+                i = dollar_idx + ft_strlen(value) - 1; 
+            else
+                i = dollar_idx - 1;
         }
         i++;
     }
-    return token;
+    return (token);
 }
 
 // envp acts like av, but instead of holding user typed arguments, 
