@@ -291,6 +291,53 @@ char *expand_token(char *token, char **env)
     return (token);
 }
 
+// Counts the length of a string ignoring the quotes
+int count_unquoted_len(char *token)
+{
+    int     i = 0;
+    int     len = 0;
+    char    q = 0;
+
+    while (token[i])
+    {
+        if ((token[i] == '"' || token[i] == '\'') && q == 0)
+            q = token[i];
+        else if (q == token[i])
+            q = 0;
+        else
+            len++;
+        i++;
+    }
+    return (len);
+}
+
+// Removes quotes from a token and frees the old token
+char *strip_quotes(char *token)
+{
+    int     i = 0;
+    int     k = 0;
+    char    q = 0;
+    char    *new_str;
+
+    new_str = malloc(sizeof(char) * (count_unquoted_len(token) + 1));
+    if (!new_str)
+        return (NULL);
+    // Copy char, skipping the quotes
+    while (token[i])
+    {
+        if ((token[i] == '"' || token[i] == '\'') && q == 0)
+            q = token[i];
+        else if (q == token[i])
+            q = 0;
+        else
+            new_str[k++] = token[i];
+        i++;
+    }
+    new_str[k] = '\0';
+    free(token);
+    return (new_str);
+}
+
 // envp acts like av, but instead of holding user typed arguments, 
 // it holds the systems background state (environment variables) .
 // We use this to find things like $USER or the PATH for executing commands.
@@ -323,7 +370,8 @@ int main(int ac, char **av, char **envp)
             {
                 while (tokens[i])
                 {
-                    tokens[i] = expand_token(tokens[i], my_env);
+                    tokens[i] = expand_token(tokens[i], my_env); 
+                    tokens[i] = strip_quotes(tokens[i]);
                     printf("Token %d: [%s]\n", i, tokens[i]);
                     i++;
                 }
