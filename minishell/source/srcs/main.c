@@ -1,68 +1,54 @@
 #include "minishell.h"
 
-typedef enum    e_token_type{
-    T_WORD,
-    T_PIPE,
-    T_REDIR_IN,
-    T_REDIR_OUT,
-    T_REDIR_APPEND,
-    T_HEREDOC
-}   t_token_type;
+int g_sig = 0;
 
-typedef struct  s_token{
-    char    *value;
-    t_token_type    type;
-    struct  s_token *next;
-}   t_token;
-
-size_t	count_words(char const *s)
+static void handle_sigint(int sig)
 {
-	size_t	count;
-
-	count = 0;
-	while (*s != '\0')
-	{
-		if (*s != ' ' && (*(s + 1) == ' ' || *(s + 1) == '\0'))
-			count++;
-		s++;
-	}
-	return (count);
+    g_sig = sig;
+    ft_putchar_fd('\n', STDOUT_FILENO);
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
 }
 
-t_list	*line_tokenizer(char *line)
+static void init_signals(void)
 {
-	size_t	word_count;
-	t_list	*tokens;
-
-	word_count = count_words(line);
-	tokens = calloc(word_count, sizeof(t_list *));
-	if (tokens == NULL)
-		return (NULL);
-	// tokens = ft_split(line, ' ');
-	// if (tokens == NULL)
-	// 	return (NULL);
-	return (tokens);
+    signal(SIGINT, handle_sigint);
+    signal(SIGQUIT, SIG_IGN);
 }
 
-void    shell_loop(void)
+static void shell_loop(t_shell *shell)
 {
-    char    *line;
-	t_list	*tokens;
+    char *input;
+    t_cmd *cmds;
 
-    line = readline("minishell$ ");
-    while (line != NULL)
+    input = readline("minishell$ ");
+    while (input != NULL)
     {
-        if (*line != '\0')
-            add_history(line);
-		tokens = line_tokenizer(line);
-        if (tokens == NULL)
-			free(line);
-		ft_lstclear(&tokens, free);
-        line = readline("minishell$ ");
+        if (*input != '\0')
+            add_history(input);
+        cmds = parse_input(input, shell);
+        if (cmds != NULL)
+        {
+            execute_cmds(cmds, shell);
+            free_cmds(cmds);
+        }
+        free(input);
+        input = readline("minishell$ ");
     }
 }
 
-int main(void)
+int main(int ac, char **av, char **envp)
 {
-	shell_loop();
+    t_shell shell;
+
+    (void)ac;
+    (void)av;
+    shell.env = init_env(envp);
+    shell.exit_status = EXIT_SUCCESS;
+    init_signals();
+    shell_loop(&shell);
+    free_env(shell.env);
+    ft_putendl_fd("exit", STDOUT_FILENO);
+    return (shell.exit_status);
 }

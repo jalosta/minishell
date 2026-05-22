@@ -6,7 +6,7 @@
 /*   By: jalosta- <jalosta-@42abudhabi.ae>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 15:31:51 by jalosta-          #+#    #+#             */
-/*   Updated: 2026/05/17 15:12:43 by jalosta-         ###   ########.fr       */
+/*   Updated: 2026/05/22 12:51:24 by jalosta-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	count_digit_places(int n)
 	int	d;
 
 	d = 1;
-	while (n / 10)
+	while ((n / 10) != 0)
 	{
 		n /= 10;
 		d++;
