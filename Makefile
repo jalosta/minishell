@@ -6,13 +6,8 @@ CFLAGS		:=	-Wall -Wextra -Werror
 INCLUDES	:=	-I source/includes
 LIBS		:=	-lreadline
 
-SRCS		:=	source/srcs/builtins.c \
-				source/srcs/env.c \
-				source/srcs/executor.c \
-				source/srcs/ft_malloc.c \
-				source/srcs/lexer.c \
-				source/srcs/main.c \
-				source/srcs/signal.c
+SRCS		:=	source/srcs/builtins.c source/srcs/env.c source/srcs/executor.c \
+				source/srcs/ft_malloc.c source/srcs/lexer.c source/srcs/main.c \
 LIBFT_DIR	:=	source/srcs/libft
 LIBFT		:=	$(LIBFT_DIR)/libft.a
 
@@ -35,5 +30,3 @@ clean:
 fclean: 		clean
 	$(RM) $(NAME)
 re: 			fclean all
-
-.PHONY: 		all clean fclean re

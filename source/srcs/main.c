@@ -2,7 +2,7 @@
 
 int g_sig = 0;
 
-static void handle_sigint(int sig)
+static void sigint_handler(int sig)
 {
     g_sig = sig;
     ft_putchar_fd('\n', STDOUT_FILENO);
@@ -13,7 +13,7 @@ static void handle_sigint(int sig)
 
 static void init_signals(void)
 {
-    signal(SIGINT, handle_sigint);
+    signal(SIGINT, sigint_handler);
     signal(SIGQUIT, SIG_IGN);
 }
 
