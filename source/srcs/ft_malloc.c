@@ -1,14 +1,14 @@
 #include "minishell.h"
 
-void *ft_malloc(size_t size)
+void	*ft_malloc(size_t size)
 {
-    void *ptr;
+	void	*ptr;
 
-    ptr = malloc(size);
-    if (ptr == NULL)
-    {
-        perror("minishell: malloc");
-        exit(EXIT_FAILURE);
-    }
-    return (ptr);
+	ptr = malloc(size);
+	if (ptr == NULL)
+	{
+		perror("minishell: malloc");
+		exit(EXIT_FAILURE);
+	}
+	return (ptr);
 }
