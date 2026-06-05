@@ -4,17 +4,17 @@ t_env	*init_env(char **envp)
 {
 	t_env	*head;
 	t_env	*curr;
-	char	*eq;
+	char	*equal;
 
 	head = NULL;
 	while (envp != NULL && *envp != NULL)
 	{
 		curr = ft_malloc(sizeof(t_env));
-		eq = ft_strchr(*envp, '=');
-		if (eq != NULL)
+		equal = ft_strchr(*envp, '=');
+		if (equal != NULL)
 		{
-			curr->key = ft_substr(*envp, 0, eq - *envp);
-			curr->value = ft_strdup(eq + 1);
+			curr->key = ft_substr(*envp, 0, equal - *envp);
+			curr->value = ft_strdup(equal + 1);
 		}
 		else
 		{
