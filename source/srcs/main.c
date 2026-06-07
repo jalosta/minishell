@@ -49,6 +49,6 @@ int	main(int ac, char **av, char **envp)
 	init_signals();
 	shell_loop(&shell);
 	free_env(shell.env);
-	ft_putendl_fd("exit", STDOUT_FILENO);
+	ft_putendl_fd("", STDOUT_FILENO);
 	return (shell.exit_status);
 }
