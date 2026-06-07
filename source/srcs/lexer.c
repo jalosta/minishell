@@ -93,7 +93,7 @@ int lexer(char *input, t_token **token_list)
     }
     if (in_single || in_double)
     {
-        ft_putendl_fd("Minishell error: unclosed quote", 2);
+        ft_putendl_fd("Minishell error: command not found", 2);
         return (1);
     }
     if (i > start)
