@@ -26,7 +26,9 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 clean:
+	$(MAKE) -C $(LIBFT_DIR) clean
 	$(RM) -r $(OBJ_DIR)
 fclean: 		clean
+	$(MAKE) -C $(LIBFT_DIR) fclean
 	$(RM) $(NAME)
 re: 			fclean all
