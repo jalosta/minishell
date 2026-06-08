@@ -45,6 +45,23 @@ typedef struct s_shell
 # define EXIT_CMD_NOT_FOUND 127
 # define EXIT_CMD_CANNOT_EXECUTE 126
 
+typedef enum e_token_type
+{
+    TOKEN_WORD,       // "ls", "-l", "Some random string.
+    TOKEN_PIPE,       // |
+    TOKEN_REDIR_IN,   // <
+    TOKEN_REDIR_OUT,  // >
+    TOKEN_APPEND,     // >>
+    TOKEN_HEREDOC     // <<
+} t_token_type;
+
+typedef struct s_token
+{
+    char            *value;
+    t_token_type    type;
+    struct s_token  *next;
+} t_token;
+
 void				*ft_malloc(size_t size);
 t_env				*init_env(char **envp);
 void				free_env(t_env *env);
@@ -53,5 +70,6 @@ t_cmd				*parse_input(char *input, t_shell *shell);
 void				free_cmds(t_cmd *cmds);
 void				execute_cmds(t_cmd *cmds, t_shell *shell);
 int					exec_builtin(t_cmd *cmd, t_shell *shell);
+int 				lexer(char *input);
 
 #endif
