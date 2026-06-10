@@ -31,10 +31,8 @@ void expander(t_token *token_list, t_env *env_list)
                     while (ft_isalnum(curr->value[i + len]) || curr->value[i + len] == '_')
                         len++;
                     len = len - 1;
-                    
                     key = ft_substr(curr->value, i + 1, len);
                     env_val = get_env_val(env_list, key);
-                    
                     if (env_val == NULL)
                         env_val = ft_strdup("");
                     else
