@@ -9,23 +9,39 @@ static t_cmd	*new_cmd(void)
 	return (cmd);
 }
 
-t_cmd	*parse_input(char *input, t_shell *shell)
+t_cmd *parse_input(t_token *token_list, t_shell *shell)
 {
-	t_cmd	*cmd;
-	char	**tokens;
+    t_cmd   *cmd;
+    t_token *curr;
+    int     count;
+    int     i;
 
-	(void)shell;
-	if (*input == '\0')
-		return (NULL);
-	tokens = ft_split(input, ' ');
-	if (tokens == NULL || tokens[0] == NULL)
-	{
-		free(tokens);
-		return (NULL);
-	}
-	cmd = new_cmd();
-	cmd->args = tokens;
-	return (cmd);
+	i = 0;
+    (void)shell;
+    if (token_list == NULL)
+        return (NULL);
+    count = 0;
+    curr = token_list;
+    while (curr != NULL)
+    {
+        if (curr->type == TOKEN_WORD)
+            count++;
+        curr = curr->next;
+    }
+    cmd = new_cmd();
+    cmd->args = ft_malloc(sizeof(char *) * (count + 1));
+    curr = token_list;
+    while (curr != NULL)
+    {
+        if (curr->type == TOKEN_WORD)
+        {
+            cmd->args[i] = ft_strdup(curr->value);
+            i++;
+        }
+        curr = curr->next;
+    }
+    cmd->args[i] = NULL;
+    return (cmd);
 }
 
 void	free_cmds(t_cmd *cmds)

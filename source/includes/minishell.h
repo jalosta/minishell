@@ -66,7 +66,7 @@ void				*ft_malloc(size_t size);
 t_env				*init_env(char **envp);
 void				free_env(t_env *env);
 char				*get_env_val(t_env *env, char *key);
-t_cmd				*parse_input(char *input, t_shell *shell);
+t_cmd 				*parse_input(t_token *token_list, t_shell *shell);
 void				free_cmds(t_cmd *cmds);
 void				execute_cmds(t_cmd *cmds, t_shell *shell);
 int					exec_builtin(t_cmd *cmd, t_shell *shell);
