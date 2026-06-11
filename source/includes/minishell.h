@@ -70,7 +70,8 @@ t_cmd				*parse_input(char *input, t_shell *shell);
 void				free_cmds(t_cmd *cmds);
 void				execute_cmds(t_cmd *cmds, t_shell *shell);
 int					exec_builtin(t_cmd *cmd, t_shell *shell);
-int 				lexer(char *input, t_token token_list);
+int 				lexer(char *input, t_token **token_list);
 void 				expander(t_token *token_list, t_env *env_list);
+void 				free_tokens(t_token **lst);
 
 #endif
