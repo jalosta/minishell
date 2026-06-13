@@ -9,15 +9,15 @@ int is_metachar(char c)
 
 t_token_type get_token_type(char *word)
 {   
-    if (ft_strcmp(word, "|") == 0)
+    if (ft_strncmp(word, "|", 2) == 0)
         return (TOKEN_PIPE);
-    if (ft_strcmp(word, "<") == 0)
+    if (ft_strncmp(word, "<", 2) == 0)
         return (TOKEN_REDIR_IN);
-    if (ft_strcmp(word, ">") == 0)
+    if (ft_strncmp(word, ">", 2) == 0)
         return (TOKEN_REDIR_OUT);
-    if (ft_strcmp(word, "<<") == 0)
+    if (ft_strncmp(word, "<<", 3) == 0)
         return (TOKEN_HEREDOC);
-    if (ft_strcmp(word, ">>") == 0)
+    if (ft_strncmp(word, ">>", 3) == 0)
         return (TOKEN_APPEND);
     return (TOKEN_WORD); 
 }
