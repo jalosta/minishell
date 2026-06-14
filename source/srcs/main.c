@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
+/*   Updated: 2026/06/14 21:30:30 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int			g_sig = 0;
@@ -20,23 +32,32 @@ static void	init_signals(void)
 static void	shell_loop(t_shell *shell)
 {
 	char	*input;
-	t_cmd	*cmds = NULL;
-	t_token *token_list = NULL;
+	t_cmd	*cmds;
+	t_token *token_list;
 
-	input = readline("minishell$ ");
-	while (input != NULL)
+	while (1)
 	{
-		if (*input != '\0')
-			add_history(input);
-		if (cmds != NULL)
-		{
-			execute_cmds(cmds, shell);
-			free_cmds(cmds);
-		}
-		lexer(input, &token_list);
 		input = readline("minishell$ ");
-		expander(token_list, shell->env);
-		cmds = parse_input(input, shell);
+		if (input == NULL)
+		{
+			ft_putendl_fd("exit", 2);
+			break;
+		}
+		if (*input != '\0')
+		{
+			add_history(input);
+			token_list = NULL;
+			cmds = NULL;
+			lexer(input, &token_list);
+			expander(token_list, shell->env);
+			cmds = parse_input(token_list, shell);
+			if (cmds != NULL)
+			{
+				execute_cmds(cmds, shell);
+				free_cmds(cmds);
+			}
+			free_tokens(&token_list);
+		}
 		free(input);
 	}
 }
