@@ -1,29 +1,77 @@
 #include "minishell.h"
 
+static char *strip_string_quotes(char *str)
+{
+    char    *new_str;
+    int     i;
+    int     j;
+    int     in_single;
+    int     in_double;
+
+    new_str = ft_malloc(ft_strlen(str) + 1);
+    i = 0;
+    j = 0;
+    in_single = 0;
+    in_double = 0;
+    while (str[i] != '\0')
+    {
+        if (str[i] == '\'' && !in_double)
+            in_single = !in_single;
+        else if (str[i] == '\"' && !in_single)
+            in_double = !in_double;
+        else
+            new_str[j++] = str[i];
+        i++;
+    }
+    new_str[j] = '\0';
+    return (new_str);
+}
+
+void trim_quotes(t_token *token_list)
+{
+    t_token *curr;
+    char    *temp;
+
+    curr = token_list;
+    while (curr != NULL)
+    {
+        if (curr->type == TOKEN_WORD)
+        {
+            temp = strip_string_quotes(curr->value);
+            free(curr->value); 
+            curr->value = temp; 
+        }
+        curr = curr->next;
+    }
+}
+
 void expander(t_token *token_list, t_env *env_list)
 {
     t_token *curr;
-    
-    curr = token_list;
-    int i;
-    int in_single;
-    char *key;
-    char *env_val;
-    int len;
-    char *prefix;
-    char *suffix;
-    char *temp;
-    char *final;
+    int     i;
+    int     in_single;
+    int     in_double;
+    char    *key;
+    char    *env_val;
+    int     len;
+    char    *prefix;
+    char    *suffix;
+    char    *temp;
+    char    *final;
 
+    curr = token_list;
     while (curr != NULL)
     {
         i = 0;
         in_single = 0;
+        in_double = 0;
         if (curr->type == TOKEN_WORD)
         {
             while (curr->value[i] != '\0')
             {
-                if (curr->value[i] == '\'')
+                if (curr->value[i] == '\"' && !in_single)
+                    in_double = !in_double;
+                else if (curr->value[i] == '\'' && !in_double)
                     in_single = !in_single;
                 else if (curr->value[i] == '$' && !in_single)
                 {

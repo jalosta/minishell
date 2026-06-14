@@ -9,39 +9,63 @@ static t_cmd	*new_cmd(void)
 	return (cmd);
 }
 
-t_cmd *parse_input(t_token *token_list, t_shell *shell)
+static int count_args(t_token *start_token)
 {
-    t_cmd   *cmd;
     t_token *curr;
     int     count;
-    int     i;
 
-	i = 0;
-    (void)shell;
-    if (token_list == NULL)
-        return (NULL);
     count = 0;
-    curr = token_list;
-    while (curr != NULL)
+    curr = start_token;
+    while (curr != NULL && curr->type != TOKEN_PIPE)
     {
         if (curr->type == TOKEN_WORD)
             count++;
         curr = curr->next;
     }
-    cmd = new_cmd();
-    cmd->args = ft_malloc(sizeof(char *) * (count + 1));
+    return (count);
+}
+
+t_cmd *parse_input(t_token *token_list, t_shell *shell)
+{
+    t_cmd   *head = NULL;
+    t_cmd   *tail = NULL;
+    t_cmd   *new_node;
+    t_token *curr;
+    int     i;
+    int     args_count;
+
+    (void)shell;
+    if (token_list == NULL)
+        return (NULL);
+
     curr = token_list;
     while (curr != NULL)
     {
-        if (curr->type == TOKEN_WORD)
+        i = 0;
+        new_node = new_cmd();
+        args_count = count_args(curr);
+        new_node->args = ft_malloc(sizeof(char *) * (args_count + 1));
+        while (curr != NULL && curr->type != TOKEN_PIPE)
         {
-            cmd->args[i] = ft_strdup(curr->value);
-            i++;
+            if (curr->type == TOKEN_WORD)
+            {
+                new_node->args[i] = ft_strdup(curr->value);
+                i++;
+            }
+            curr = curr->next;
         }
-        curr = curr->next;
+        new_node->args[i] = NULL;
+
+        if (head == NULL)
+            head = new_node;
+        else
+            tail->next = new_node;
+        tail = new_node;
+
+        if (curr != NULL && curr->type == TOKEN_PIPE)
+            curr = curr->next;
     }
-    cmd->args[i] = NULL;
-    return (cmd);
+    return (head);
 }
 
 void	free_cmds(t_cmd *cmds)
