@@ -92,26 +92,54 @@ static void route_child_io(t_cmd *cmd, int fd[2], int prev_fd)
     }
 }
 
+static void route_file_redirections(t_cmd *cmd)
+{
+    int file_fd;
+
+	if (cmd->in_file != NULL)
+    {
+        file_fd = open(cmd->in_file, O_RDONLY);
+        if (file_fd == -1)
+        {
+            perror(cmd->in_file);
+            exit(EXIT_FAILURE);
+        }
+        dup2(file_fd, STDIN_FILENO);
+        close(file_fd);
+    }
+    if (cmd->out_file != NULL)
+    {
+        if (cmd->append == 1)
+			file_fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        else
+			file_fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (file_fd == -1)
+        {
+            perror(cmd->out_file);
+            exit(EXIT_FAILURE);
+        } 
+		dup2(file_fd, STDOUT_FILENO);
+        close(file_fd);
+    }
+}
+
 static void execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
 {
     char    *path;
     char    **env_arr;
 
     route_child_io(cmd, fd, prev_fd);
-    
+    route_file_redirections(cmd);
     if (exec_builtin(cmd, shell) == EXIT_SUCCESS)
         exit(EXIT_SUCCESS); 
-        
     path = find_path(cmd->args[0], shell->env);
     if (path == NULL)
     {
         ft_putendl_fd("minishell: command not found", STDERR_FILENO);
         exit(EXIT_CMD_NOT_FOUND);
     }
-    
     env_arr = env_list_to_array(shell->env);
     execve(path, cmd->args, env_arr);
-    
     free_array(env_arr);
     perror("execve");
     exit(EXIT_CMD_CANNOT_EXECUTE);

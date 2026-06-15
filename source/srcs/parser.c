@@ -25,6 +25,38 @@ static int count_args(t_token *start_token)
     return (count);
 }
 
+static void handle_redirections(t_cmd *cmd, t_token **curr_ptr)
+{
+    t_token *curr;
+
+    curr = *curr_ptr;
+    if (curr->type == TOKEN_REDIR_OUT)
+    {
+        curr = curr->next;
+        if (curr != NULL && curr->type == TOKEN_WORD)
+        {
+            cmd->out_file = ft_strdup(curr->value);
+            cmd->append = 0;
+        }
+    }
+    else if (curr->type == TOKEN_APPEND)
+    {
+        curr = curr->next;
+        if (curr != NULL && curr->type == TOKEN_WORD)
+        {
+            cmd->out_file = ft_strdup(curr->value);
+            cmd->append = 1;
+        }
+    }
+    else if (curr->type == TOKEN_REDIR_IN)
+    {
+        curr = curr->next;
+        if (curr != NULL && curr->type == TOKEN_WORD)
+            cmd->in_file = ft_strdup(curr->value);
+    }
+    *curr_ptr = curr;
+}
+
 t_cmd *parse_input(t_token *token_list, t_shell *shell)
 {
     t_cmd   *head = NULL;
@@ -52,7 +84,11 @@ t_cmd *parse_input(t_token *token_list, t_shell *shell)
                 new_node->args[i] = ft_strdup(curr->value);
                 i++;
             }
-            curr = curr->next;
+            else if (curr->type == TOKEN_REDIR_OUT ||
+                 curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
+                handle_redirections(new_node, &curr);
+            if (curr != NULL)
+                curr = curr->next;
         }
         new_node->args[i] = NULL;
 
