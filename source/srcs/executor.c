@@ -23,7 +23,6 @@ static char *find_path(char *cmd, t_env *env)
     paths = get_env_val(env, "PATH");
     if (paths == NULL)
         return (NULL);
-    
     split = ft_split(paths, ':');
     i = 0;
     while (split != NULL && split[i] != NULL)
