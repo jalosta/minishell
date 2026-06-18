@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/06/14 21:51:16 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/06/18 16:02:42 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	shell_loop(t_shell *shell)
 {
 	char	*input;
 	t_cmd	*cmds;
-	t_token *token_list;
+	t_token	*token_list;
 
 	while (1)
 	{
@@ -41,7 +41,7 @@ static void	shell_loop(t_shell *shell)
 		if (input == NULL)
 		{
 			ft_putendl_fd("exit", 2);
-			break;
+			break ;
 		}
 		if (*input != '\0')
 		{
@@ -65,7 +65,7 @@ static void	shell_loop(t_shell *shell)
 
 int	main(int ac, char **av, char **envp)
 {
-	t_shell shell;
+	t_shell	shell;
 
 	(void)ac;
 	(void)av;

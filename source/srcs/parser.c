@@ -9,170 +9,170 @@ static t_cmd	*new_cmd(void)
 	return (cmd);
 }
 
-static int count_args(t_token *start_token)
+static int	count_args(t_token *start_token)
 {
-    t_token *curr;
-    int     count;
+	t_token	*curr;
+	int		count;
 
-    count = 0;
-    curr = start_token;
-    while (curr != NULL && curr->type != TOKEN_PIPE)
-    {
-        if (curr->type == TOKEN_WORD)
-            count++;
-        curr = curr->next;
-    }
-    return (count);
+	count = 0;
+	curr = start_token;
+	while (curr != NULL && curr->type != TOKEN_PIPE)
+	{
+		if (curr->type == TOKEN_WORD)
+			count++;
+		curr = curr->next;
+	}
+	return (count);
 }
 
-static void handle_redirections(t_cmd *cmd, t_token **curr_ptr)
+static void	handle_redirections(t_cmd *cmd, t_token **curr_ptr)
 {
-    t_token *curr;
+	t_token	*curr;
 
-    curr = *curr_ptr;
-    if (curr->type == TOKEN_REDIR_OUT)
-    {
-        curr = curr->next;
-        if (curr != NULL && curr->type == TOKEN_WORD)
-        {
-            cmd->out_file = ft_strdup(curr->value);
-            cmd->append = 0;
-        }
-    }
-    else if (curr->type == TOKEN_APPEND)
-    {
-        curr = curr->next;
-        if (curr != NULL && curr->type == TOKEN_WORD)
-        {
-            cmd->out_file = ft_strdup(curr->value);
-            cmd->append = 1;
-        }
-    }
-    else if (curr->type == TOKEN_REDIR_IN)
-    {
-        curr = curr->next;
-        if (curr != NULL && curr->type == TOKEN_WORD)
-            cmd->in_file = ft_strdup(curr->value);
-    }
-    *curr_ptr = curr;
+	curr = *curr_ptr;
+	if (curr->type == TOKEN_REDIR_OUT)
+	{
+		curr = curr->next;
+		if (curr != NULL && curr->type == TOKEN_WORD)
+		{
+			cmd->out_file = ft_strdup(curr->value);
+			cmd->append = 0;
+		}
+	}
+	else if (curr->type == TOKEN_APPEND)
+	{
+		curr = curr->next;
+		if (curr != NULL && curr->type == TOKEN_WORD)
+		{
+			cmd->out_file = ft_strdup(curr->value);
+			cmd->append = 1;
+		}
+	}
+	else if (curr->type == TOKEN_REDIR_IN)
+	{
+		curr = curr->next;
+		if (curr != NULL && curr->type == TOKEN_WORD)
+			cmd->in_file = ft_strdup(curr->value);
+	}
+	*curr_ptr = curr;
 }
 
-static char *expand_heredoc_line(char *line, t_shell *shell)
+static char	*expand_heredoc_line(char *line, t_shell *shell)
 {
-    int     i;
-    int     len;
-    char    *prefix;
-    char    *key;
-    char    *val;
-    char    *suffix;
-    char    *temp;
-    char    *final;
+	int		i;
+	int		len;
+	char	*prefix;
+	char	*key;
+	char	*val;
+	char	*suffix;
+	char	*temp;
+	char	*final;
 
-    i = 0;
-    final = ft_strdup(line);
-    free(line);
-    while (final[i] != '\0')
-    {
-        if (final[i] == '$' && (ft_isalnum(final[i + 1]) || final[i + 1] == '_' || final[i + 1] == '?'))
-        {
-            prefix = ft_substr(final, 0, i);
-            len = 1;
-            if (final[i + 1] == '?')
-                len = 2;
-            else
-            {
-                while (ft_isalnum(final[i + len]) || final[i + len] == '_')
-                    len++;
-            }
-            key = ft_substr(final, i + 1, len - 1);
-            if (key[0] == '?')
-                val = ft_itoa(shell->exit_status);
-            else
-            {
-                val = get_env_val(shell->env, key);
-                if (val == NULL)
-                    val = ft_strdup("");
-                else
-                    val = ft_strdup(val);
-            }
-            suffix = ft_strdup(final + i + len);
-            temp = ft_strjoin(prefix, val);
-            free(final);
-            final = ft_strjoin(temp, suffix);
-            free(prefix);
-            free(key);
-            free(suffix);
-            free(temp);
-            i = i + ft_strlen(val) - 1;
-            free(val);
-        }
-        i++;
-    }
-    return (final);
+	i = 0;
+	final = ft_strdup(line);
+	free(line);
+	while (final[i] != '\0')
+	{
+		if (final[i] == '$' && (ft_isalnum(final[i + 1])
+				|| final[i + 1] == '_' || final[i + 1] == '?'))
+		{
+			prefix = ft_substr(final, 0, i);
+			len = 1;
+			if (final[i + 1] == '?')
+				len = 2;
+			else
+			{
+				while (ft_isalnum(final[i + len]) || final[i + len] == '_')
+					len++;
+			}
+			key = ft_substr(final, i + 1, len - 1);
+			if (key[0] == '?')
+				val = ft_itoa(shell->exit_status);
+			else
+			{
+				val = get_env_val(shell->env, key);
+				if (val == NULL)
+					val = ft_strdup("");
+				else
+					val = ft_strdup(val);
+			}
+			suffix = ft_strdup(final + i + len);
+			temp = ft_strjoin(prefix, val);
+			free(final);
+			final = ft_strjoin(temp, suffix);
+			free(prefix);
+			free(key);
+			free(suffix);
+			free(temp);
+			i = i + ft_strlen(val) - 1;
+			free(val);
+		}
+		i++;
+	}
+	return (final);
 }
 
 static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
 {
-    t_token *curr;
-    char    *delim;
-    char    *line;
-    int     fd;
-    int     expand_vars;
+	t_token	*curr;
+	char	*delim;
+	char	*line;
+	int		fd;
+	int		expand_vars;
 
-    curr = *curr_ptr;
-    curr = curr->next;
-    if (curr != NULL && curr->type == TOKEN_WORD)
-    {
-        delim = curr->value;
-        expand_vars = 1;
-        if (delim[0] == '\'' || delim[0] == '\"')
-        {
-            expand_vars = 0;
-            ft_memmove(delim, delim + 1, ft_strlen(delim));
-            delim[ft_strlen(delim) - 1] = '\0';
-        }
-        fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1)
-        {
-            perror("minishell: heredoc");
-            return ;
-        }
-        while (1)
-        {
-            line = readline("> ");
-            if (line == NULL)
-            {
-                ft_putstr_fd("minishell: warning: heredoc is delimited by EOF (wanted `", 2);
-                ft_putstr_fd(delim, 2);
-                ft_putendl_fd("')", 2);
-                break;
-            }
-            if (ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
-            {
-                free(line);
-                break;
-            }
-            if (expand_vars == 1)
-                line = expand_heredoc_line(line, shell);
-
-            write(fd, line, ft_strlen(line));
-            write(fd, "\n", 1);
-            free(line);
-        }
-        close(fd);
-        cmd->in_file = ft_strdup(".heredoc.tmp");
-    }
-    *curr_ptr = curr;
+	curr = *curr_ptr;
+	curr = curr->next;
+	if (curr != NULL && curr->type == TOKEN_WORD)
+	{
+		delim = curr->value;
+		expand_vars = 1;
+		if (delim[0] == '\'' || delim[0] == '\"')
+		{
+			expand_vars = 0;
+			ft_memmove(delim, delim + 1, ft_strlen(delim));
+			delim[ft_strlen(delim) - 1] = '\0';
+		}
+		fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd == -1)
+		{
+			perror("minishell: heredoc");
+			return ;
+		}
+		while (1)
+		{
+			line = readline("> ");
+			if (line == NULL)
+			{
+				ft_putstr_fd("minishell: heredoc is delimited by EOF", 2);
+				ft_putstr_fd(delim, 2);
+				ft_putendl_fd("')", 2);
+				break ;
+			}
+			if (ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
+			{
+				free(line);
+				break ;
+			}
+			if (expand_vars == 1)
+				line = expand_heredoc_line(line, shell);
+			write(fd, line, ft_strlen(line));
+			write(fd, "\n", 1);
+			free(line);
+		}
+		close(fd);
+		cmd->in_file = ft_strdup(".heredoc.tmp");
+	}
+	*curr_ptr = curr;
 }
 
-t_cmd *parse_input(t_token *token_list, t_shell *shell)
+t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 {
-    t_cmd   *head = NULL;
-    t_cmd   *tail = NULL;
-    t_cmd   *new_node;
-    t_token *curr;
-    int     i;
-    int     args_count;
+	t_cmd	*head = NULL;
+	t_cmd	*tail = NULL;
+	t_cmd	*new_node;
+	t_token	*curr;
+	int		i;
+	int		args_count;
 
     (void)shell;
     if (token_list == NULL)
@@ -216,8 +216,8 @@ t_cmd *parse_input(t_token *token_list, t_shell *shell)
 
 void	free_cmds(t_cmd *cmds)
 {
-	t_cmd *tmp;
-	int i;
+	t_cmd	*tmp;
+	int		i;
 
 	while (cmds != NULL)
 	{

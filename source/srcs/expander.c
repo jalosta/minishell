@@ -50,8 +50,8 @@ void	trim_quotes(t_token *token_list)
 		if (curr->type == TOKEN_WORD)
 		{
 			temp = strip_string_quotes(curr->value);
-			free(curr->value); 
-			curr->value = temp; 
+			free(curr->value);
+			curr->value = temp;
 		}
 		curr = curr->next;
 	}
