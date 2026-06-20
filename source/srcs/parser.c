@@ -57,81 +57,18 @@ static void	handle_redirections(t_cmd *cmd, t_token **curr_ptr)
 	*curr_ptr = curr;
 }
 
-static char	*expand_heredoc_line(char *line, t_shell *shell)
-{
-	int		i;
-	int		len;
-	char	*prefix;
-	char	*key;
-	char	*val;
-	char	*suffix;
-	char	*temp;
-	char	*final;
-
-	i = 0;
-	final = ft_strdup(line);
-	free(line);
-	while (final[i] != '\0')
-	{
-		if (final[i] == '$' && (ft_isalnum(final[i + 1])
-				|| final[i + 1] == '_' || final[i + 1] == '?'))
-		{
-			prefix = ft_substr(final, 0, i);
-			len = 1;
-			if (final[i + 1] == '?')
-				len = 2;
-			else
-			{
-				while (ft_isalnum(final[i + len]) || final[i + len] == '_')
-					len++;
-			}
-			key = ft_substr(final, i + 1, len - 1);
-			if (key[0] == '?')
-				val = ft_itoa(shell->exit_status);
-			else
-			{
-				val = get_env_val(shell->env, key);
-				if (val == NULL)
-					val = ft_strdup("");
-				else
-					val = ft_strdup(val);
-			}
-			suffix = ft_strdup(final + i + len);
-			temp = ft_strjoin(prefix, val);
-			free(final);
-			final = ft_strjoin(temp, suffix);
-			free(prefix);
-			free(key);
-			free(suffix);
-			free(temp);
-			i = i + ft_strlen(val) - 1;
-			free(val);
-		}
-		i++;
-	}
-	return (final);
-}
-
-static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
+static void	handle_heredoc(t_cmd *cmd, t_token **curr_ptr)
 {
 	t_token	*curr;
 	char	*delim;
 	char	*line;
 	int		fd;
-	int		expand_vars;
 
 	curr = *curr_ptr;
 	curr = curr->next;
 	if (curr != NULL && curr->type == TOKEN_WORD)
 	{
 		delim = curr->value;
-		expand_vars = 1;
-		if (delim[0] == '\'' || delim[0] == '\"')
-		{
-			expand_vars = 0;
-			ft_memmove(delim, delim + 1, ft_strlen(delim));
-			delim[ft_strlen(delim) - 1] = '\0';
-		}
 		fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd == -1)
 		{
@@ -141,20 +78,12 @@ static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
 		while (1)
 		{
 			line = readline("> ");
-			if (line == NULL)
-			{
-				ft_putstr_fd("minishell: heredoc is delimited by EOF", 2);
-				ft_putstr_fd(delim, 2);
-				ft_putendl_fd("')", 2);
-				break ;
-			}
-			if (ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
+			if (line == NULL ||
+				ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
 			{
 				free(line);
 				break ;
 			}
-			if (expand_vars == 1)
-				line = expand_heredoc_line(line, shell);
 			write(fd, line, ft_strlen(line));
 			write(fd, "\n", 1);
 			free(line);
