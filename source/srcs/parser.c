@@ -125,7 +125,7 @@ t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 				|| curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
 				handle_redirections(new_node, &curr);
 			else if (curr->type == TOKEN_HEREDOC)
-				handle_heredoc(new_node, &curr, shell);
+				handle_heredoc(new_node, &curr);
 			if (curr != NULL)
 				curr = curr->next;
 		}
