@@ -174,44 +174,42 @@ t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 	int		i;
 	int		args_count;
 
-    (void)shell;
-    if (token_list == NULL)
-        return (NULL);
+	(void)shell;
+	if (token_list == NULL)
+		return (NULL);
 
-    curr = token_list;
-    while (curr != NULL)
-    {
-        i = 0;
-        new_node = new_cmd();
-        args_count = count_args(curr);
-        new_node->args = ft_malloc(sizeof(char *) * (args_count + 1));
-        while (curr != NULL && curr->type != TOKEN_PIPE)
-        {
-            if (curr->type == TOKEN_WORD)
-            {
-                new_node->args[i] = ft_strdup(curr->value);
-                i++;
-            }
-            else if (curr->type == TOKEN_REDIR_OUT ||
-                 curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
-                handle_redirections(new_node, &curr);
-            else if (curr->type == TOKEN_HEREDOC)
-                handle_heredoc(new_node, &curr, shell);
-            if (curr != NULL)
-                curr = curr->next;
-        }
-        new_node->args[i] = NULL;
-
-        if (head == NULL)
-            head = new_node;
-        else
-            tail->next = new_node;
-        tail = new_node;
-
-        if (curr != NULL && curr->type == TOKEN_PIPE)
-            curr = curr->next;
-    }
-    return (head);
+	curr = token_list;
+	while (curr != NULL)
+	{
+		i = 0;
+		new_node = new_cmd();
+		args_count = count_args(curr);
+		new_node->args = ft_malloc(sizeof(char *) * (args_count + 1));
+		while (curr != NULL && curr->type != TOKEN_PIPE)
+		{
+			if (curr->type == TOKEN_WORD)
+			{
+				new_node->args[i] = ft_strdup(curr->value);
+				i++;
+			}
+			else if (curr->type == TOKEN_REDIR_OUT
+				|| curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
+				handle_redirections(new_node, &curr);
+			else if (curr->type == TOKEN_HEREDOC)
+				handle_heredoc(new_node, &curr, shell);
+			if (curr != NULL)
+				curr = curr->next;
+		}
+		new_node->args[i] = NULL;
+		if (head == NULL)
+			head = new_node;
+		else
+			tail->next = new_node;
+		tail = new_node;
+		if (curr != NULL && curr->type == TOKEN_PIPE)
+			curr = curr->next;
+	}
+	return (head);
 }
 
 void	free_cmds(t_cmd *cmds)

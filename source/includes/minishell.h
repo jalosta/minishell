@@ -47,32 +47,32 @@ typedef struct s_shell
 
 typedef enum e_token_type
 {
-    TOKEN_WORD,       // "ls", "-l", "Some random string.
-    TOKEN_PIPE,       // |
-    TOKEN_REDIR_IN,   // <
-    TOKEN_REDIR_OUT,  // >
-    TOKEN_APPEND,     // >>
-    TOKEN_HEREDOC     // <<
+	TOKEN_WORD,       // "ls", "-l", "Some random string.
+	TOKEN_PIPE,       // |
+	TOKEN_REDIR_IN,   // <
+	TOKEN_REDIR_OUT,  // >
+	TOKEN_APPEND,     // >>
+	TOKEN_HEREDOC     // <<
 } t_token_type;
 
-typedef struct s_token
+typedef struct	s_token
 {
-    char            *value;
-    t_token_type    type;
-    struct s_token  *next;
-} t_token;
+	char			*value;
+	t_token_type	type;
+	struct	s_token	*next;
+}	t_token;
 
-void				*ft_malloc(size_t size);
-t_env				*init_env(char **envp);
-void				free_env(t_env *env);
-char				*get_env_val(t_env *env, char *key);
-t_cmd 				*parse_input(t_token *token_list, t_shell *shell);
-void				free_cmds(t_cmd *cmds);
-void				execute_cmds(t_cmd *cmds, t_shell *shell);
-int					exec_builtin(t_cmd *cmd, t_shell *shell);
-int 				lexer(char *input, t_token **token_list);
-void 				expander(t_token *token_list, t_env *env_list);
-void 				trim_quotes(t_token *token_list);
-void 				free_tokens(t_token **lst);
+void			*ft_malloc(size_t size);
+t_env			*init_env(char **envp);
+void			free_env(t_env *env);
+char			*get_env_val(t_env *env, char *key);
+t_cmd			*parse_input(t_token *token_list, t_shell *shell);
+void			free_cmds(t_cmd *cmds);
+void			execute_cmds(t_cmd *cmds, t_shell *shell);
+int				exec_builtin(t_cmd *cmd, t_shell *shell);
+int 			lexer(char *input, t_token **token_list);
+void 			expander(t_token *token_list, t_env *env_list);
+void 			trim_quotes(t_token *token_list);
+void 			free_tokens(t_token **lst);
 
 #endif
