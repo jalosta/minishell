@@ -27,48 +27,42 @@ static int	count_args(t_token *start_token)
 
 static void	handle_redirections(t_cmd *cmd, t_token **curr_ptr)
 {
-	t_token	*curr;
-
-	curr = *curr_ptr;
-	if (curr->type == TOKEN_REDIR_OUT)
+	if ((*curr_ptr)->type == TOKEN_REDIR_OUT)
 	{
-		curr = curr->next;
-		if (curr != NULL && curr->type == TOKEN_WORD)
+		*curr_ptr = (*curr_ptr)->next;
+		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
 		{
-			cmd->out_file = ft_strdup(curr->value);
+			cmd->out_file = ft_strdup((*curr_ptr)->value);
 			cmd->append = 0;
 		}
 	}
-	else if (curr->type == TOKEN_APPEND)
+	else if ((*curr_ptr)->type == TOKEN_APPEND)
 	{
-		curr = curr->next;
-		if (curr != NULL && curr->type == TOKEN_WORD)
+		*curr_ptr = (*curr_ptr)->next;
+		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
 		{
-			cmd->out_file = ft_strdup(curr->value);
+			cmd->out_file = ft_strdup((*curr_ptr)->value);
 			cmd->append = 1;
 		}
 	}
-	else if (curr->type == TOKEN_REDIR_IN)
+	else if ((*curr_ptr)->type == TOKEN_REDIR_IN)
 	{
-		curr = curr->next;
-		if (curr != NULL && curr->type == TOKEN_WORD)
-			cmd->in_file = ft_strdup(curr->value);
+		*curr_ptr = (*curr_ptr)->next;
+		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
+			cmd->in_file = ft_strdup((*curr_ptr)->value);
 	}
-	*curr_ptr = curr;
 }
 
-static void	handle_heredoc(t_cmd *cmd, t_token **curr_ptr)
+static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr)
 {
-	t_token	*curr;
 	char	*delim;
 	char	*line;
 	int		fd;
 
-	curr = *curr_ptr;
-	curr = curr->next;
-	if (curr != NULL && curr->type == TOKEN_WORD)
+	*curr_ptr = (*curr_ptr)->next;
+	if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
 	{
-		delim = curr->value;
+		delim = (*curr_ptr)->value;
 		fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd == -1)
 		{
@@ -91,18 +85,19 @@ static void	handle_heredoc(t_cmd *cmd, t_token **curr_ptr)
 		close(fd);
 		cmd->in_file = ft_strdup(".heredoc.tmp");
 	}
-	*curr_ptr = curr;
 }
 
 t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 {
-	t_cmd	*head = NULL;
-	t_cmd	*tail = NULL;
+	t_cmd	*head;
+	t_cmd	*tail;
 	t_cmd	*new_node;
 	t_token	*curr;
 	int		i;
 	int		args_count;
 
+	head = NULL;
+	tail = NULL;
 	(void)shell;
 	if (token_list == NULL)
 		return (NULL);
@@ -123,7 +118,7 @@ t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 			}
 			else if (curr->type == TOKEN_REDIR_OUT
 				|| curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
-				handle_redirections(new_node, &curr);
+				handle_redir(new_node, &curr);
 			else if (curr->type == TOKEN_HEREDOC)
 				handle_heredoc(new_node, &curr);
 			if (curr != NULL)
