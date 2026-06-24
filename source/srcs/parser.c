@@ -53,38 +53,48 @@ static void	handle_redirections(t_cmd *cmd, t_token **curr_ptr)
 	}
 }
 
-static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr)
+static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
 {
-	char	*delim;
-	char	*line;
-	int		fd;
+    char    *delim;
+    char    *line;
+    int     fd;
+    int     expand_vars;
 
-	*curr_ptr = (*curr_ptr)->next;
-	if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
-	{
-		delim = (*curr_ptr)->value;
-		fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (fd == -1)
-		{
-			perror("minishell: heredoc");
-			return ;
-		}
-		while (1)
-		{
-			line = readline("> ");
-			if (line == NULL ||
-				ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
-			{
-				free(line);
-				break ;
-			}
-			write(fd, line, ft_strlen(line));
-			write(fd, "\n", 1);
-			free(line);
-		}
-		close(fd);
-		cmd->in_file = ft_strdup(".heredoc.tmp");
-	}
+    *curr_ptr = (*curr_ptr)->next;
+    if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
+    {
+        delim = (*curr_ptr)->value;
+        expand_vars = 1;
+        if (delim[0] == '\'' || delim[0] == '\"')
+        {
+            expand_vars = 0;
+            ft_memmove(delim, delim + 1, ft_strlen(delim));
+            delim[ft_strlen(delim) - 1] = '\0';
+        }
+        fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd == -1)
+        {
+            perror("minishell: heredoc");
+            return ;
+        }
+        while (1)
+        {
+            line = readline("> ");
+            if (line == NULL || ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
+            {
+                free(line);
+                break ;
+            }
+            if (expand_vars == 1)
+                line = expand_heredoc_line(line, shell);
+                
+            write(fd, line, ft_strlen(line));
+            write(fd, "\n", 1);
+            free(line);
+        }
+        close(fd);
+        cmd->in_file = ft_strdup(".heredoc.tmp");
+    }
 }
 
 t_cmd	*parse_input(t_token *token_list, t_shell *shell)
@@ -118,9 +128,9 @@ t_cmd	*parse_input(t_token *token_list, t_shell *shell)
 			}
 			else if (curr->type == TOKEN_REDIR_OUT
 				|| curr->type == TOKEN_APPEND || curr->type == TOKEN_REDIR_IN)
-				handle_redir(new_node, &curr);
+				handle_redirections(new_node, &curr);
 			else if (curr->type == TOKEN_HEREDOC)
-				handle_heredoc(new_node, &curr);
+				handle_heredoc(new_node, &curr, shell);
 			if (curr != NULL)
 				curr = curr->next;
 		}

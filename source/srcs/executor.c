@@ -134,26 +134,28 @@ static void	route_file_redirections(t_cmd *cmd)
 	}
 }
 
-static void	execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
+static void execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
 {
-	char	*path;
-	char	**env_arr;
+    char    *path;
+    char    **env_arr;
 
-	route_child_io(cmd, fd, prev_fd);
-	route_file_redirections(cmd);
-	if (exec_builtin(cmd, shell) == EXIT_SUCCESS)
-		exit(EXIT_SUCCESS);
-	path = find_path(cmd->args[0], shell->env);
-	if (path == NULL)
-	{
-		ft_putendl_fd("minishell: command not found", STDERR_FILENO);
-		exit(EXIT_CMD_NOT_FOUND);
-	}
-	env_arr = env_list_to_array(shell->env);
-	execve(path, cmd->args, env_arr);
-	free_array(env_arr);
-	perror("execve");
-	exit(EXIT_CMD_CANNOT_EXECUTE);
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    route_child_io(cmd, fd, prev_fd);
+    route_file_redirections(cmd);
+    if (exec_builtin(cmd, shell) == EXIT_SUCCESS)
+        exit(EXIT_SUCCESS);
+    path = find_path(cmd->args[0], shell->env);
+    if (path == NULL)
+    {
+        ft_putendl_fd("minishell: command not found", STDERR_FILENO);
+        exit(EXIT_CMD_NOT_FOUND);
+    }
+    env_arr = env_list_to_array(shell->env);
+    execve(path, cmd->args, env_arr);
+    free_array(env_arr);
+    perror("execve");
+    exit(EXIT_CMD_CANNOT_EXECUTE);
 }
 
 static int	update_parent_pipes(t_cmd *cmd, int fd[2], int prev_fd)
@@ -178,32 +180,66 @@ static void	wait_for_children(t_shell *shell)
 		shell->exit_status = WEXITSTATUS(status);
 }
 
-void	execute_cmds(t_cmd *cmds, t_shell *shell)
+static int is_builtin(char *cmd)
 {
-	t_cmd	*curr;
-	int		fd[2];
-	int		prev_fd;
-	pid_t	pid;
+    if (!cmd)
+        return (0);
+    if (ft_strncmp(cmd, "cd", 3) == 0 || ft_strncmp(cmd, "exit", 5) == 0 ||
+        ft_strncmp(cmd, "env", 4) == 0 || ft_strncmp(cmd, "pwd", 4) == 0 ||
+        ft_strncmp(cmd, "export", 7) == 0 || ft_strncmp(cmd, "unset", 6) == 0)
+        return (1);
+    return (0);
+}
 
-	if (cmds == NULL || cmds->args == NULL || cmds->args[0] == NULL)
-		return ;
-	prev_fd = -1;
-	curr = cmds;
-	while (curr != NULL)
-	{
-		if (curr->next != NULL && pipe(fd) == -1)
-		{
-			perror("pipe");
-			return ;
-		}
-		pid = fork();
-		if (pid == -1)
-			perror("fork");
-		else if (pid == 0)
-			execute_child(curr, shell, fd, prev_fd);
-		else
-			prev_fd = update_parent_pipes(curr, fd, prev_fd);
-		curr = curr->next;
-	}
-	wait_for_children(shell);
+void    execute_cmds(t_cmd *cmds, t_shell *shell)
+{
+    t_cmd   *curr;
+    int     fd[2];
+    int     prev_fd;
+    pid_t   pid;
+    int     saved_stdout;
+
+    if (cmds == NULL || cmds->args == NULL || cmds->args[0] == NULL)
+        return ;
+    if (cmds->next == NULL && is_builtin(cmds->args[0]))
+    {
+        saved_stdout = dup(STDOUT_FILENO); // Backup the terminal output
+        if (cmds->out_file != NULL)
+        {
+            int out_fd = (cmds->append) ? open(cmds->out_file, O_WRONLY | O_CREAT | O_APPEND, 0644) 
+                                        : open(cmds->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (out_fd == -1)
+            {
+                perror(cmds->out_file);
+                shell->exit_status = 1;
+                return ;
+            }
+            dup2(out_fd, STDOUT_FILENO);
+            close(out_fd);
+        }
+        exec_builtin(cmds, shell);
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdout);
+        return ;
+    }
+    prev_fd = -1;
+    curr = cmds;
+    while (curr != NULL)
+    {
+        if (curr->next != NULL && pipe(fd) == -1)
+        {
+            perror("pipe");
+            return ;
+        }
+        pid = fork();
+        if (pid == -1)
+            perror("fork");
+        else if (pid == 0)
+            execute_child(curr, shell, fd, prev_fd);
+        else
+            prev_fd = update_parent_pipes(curr, fd, prev_fd);
+        curr = curr->next;
+    }
+    wait_for_children(shell);
+    unlink(".heredoc.tmp");
 }
