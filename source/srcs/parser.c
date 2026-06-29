@@ -25,40 +25,50 @@ static int	count_args(t_token *start_token)
 	return (count);
 }
 
-static void	handle_redirections(t_cmd *cmd, t_token **curr_ptr)
+static void handle_redirections(t_cmd *cmd, t_token **curr_ptr)
 {
-	if ((*curr_ptr)->type == TOKEN_REDIR_OUT)
-	{
-		*curr_ptr = (*curr_ptr)->next;
-		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
-		{
-			cmd->out_file = ft_strdup((*curr_ptr)->value);
-			cmd->append = 0;
-		}
-	}
-	else if ((*curr_ptr)->type == TOKEN_APPEND)
-	{
-		*curr_ptr = (*curr_ptr)->next;
-		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
-		{
-			cmd->out_file = ft_strdup((*curr_ptr)->value);
-			cmd->append = 1;
-		}
-	}
-	else if ((*curr_ptr)->type == TOKEN_REDIR_IN)
-	{
-		*curr_ptr = (*curr_ptr)->next;
-		if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
-			cmd->in_file = ft_strdup((*curr_ptr)->value);
-	}
+    int fd;
+    int is_append;
+
+    if ((*curr_ptr)->type == TOKEN_REDIR_OUT || (*curr_ptr)->type == TOKEN_APPEND)
+    {
+        is_append = ((*curr_ptr)->type == TOKEN_APPEND);
+        *curr_ptr = (*curr_ptr)->next;
+        if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
+        {
+            if (cmd->out_file)
+                free(cmd->out_file);
+            cmd->out_file = ft_strdup((*curr_ptr)->value);
+            cmd->append = is_append;
+            if (is_append)
+                fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            else
+                fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (fd != -1)
+                close(fd);
+        }
+    }
+    else if ((*curr_ptr)->type == TOKEN_REDIR_IN)
+    {
+        *curr_ptr = (*curr_ptr)->next;
+        if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
+        {
+            if (cmd->in_file)
+                free(cmd->in_file);
+            cmd->in_file = ft_strdup((*curr_ptr)->value);
+        }
+    }
 }
 
 static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
 {
-    char    *delim;
-    char    *line;
-    int     fd;
-    int     expand_vars;
+    char        *delim;
+    char        *line;
+    int         fd;
+    int         expand_vars;
+    static int  hd_count = 0;
+    char        *num;
+    char        *tmp_name;
 
     *curr_ptr = (*curr_ptr)->next;
     if (*curr_ptr != NULL && (*curr_ptr)->type == TOKEN_WORD)
@@ -71,10 +81,14 @@ static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
             ft_memmove(delim, delim + 1, ft_strlen(delim));
             delim[ft_strlen(delim) - 1] = '\0';
         }
-        fd = open(".heredoc.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        num = ft_itoa(hd_count++);
+        tmp_name = ft_strjoin(".heredoc.tmp.", num);
+        free(num);
+        fd = open(tmp_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         if (fd == -1)
         {
             perror("minishell: heredoc");
+            free(tmp_name);
             return ;
         }
         while (1)
@@ -87,13 +101,13 @@ static void handle_heredoc(t_cmd *cmd, t_token **curr_ptr, t_shell *shell)
             }
             if (expand_vars == 1)
                 line = expand_heredoc_line(line, shell);
-                
             write(fd, line, ft_strlen(line));
             write(fd, "\n", 1);
             free(line);
         }
         close(fd);
-        cmd->in_file = ft_strdup(".heredoc.tmp");
+        cmd->in_file = tmp_name;
+        cmd->heredoc = 1;
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/06/18 16:02:42 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/06/29 21:49:00 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void	shell_loop(t_shell *shell)
 			token_list = NULL;
 			cmds = NULL;
 			lexer(input, &token_list);
-			expander(token_list, shell->env);
+			expander(token_list, shell);
 			trim_quotes(token_list);
 			cmds = parse_input(token_list, shell);
 			if (cmds != NULL)
@@ -70,6 +70,7 @@ int	main(int ac, char **av, char **envp)
 	(void)ac;
 	(void)av;
 	shell.env = init_env(envp);
+	shell.exit_status = 0;
 	init_signals();
 	shell_loop(&shell);
 	free_env(shell.env);
