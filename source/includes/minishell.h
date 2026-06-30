@@ -71,8 +71,21 @@ void			free_cmds(t_cmd *cmds);
 void			execute_cmds(t_cmd *cmds, t_shell *shell);
 int				exec_builtin(t_cmd *cmd, t_shell *shell);
 int 			lexer(char *input, t_token **token_list);
-void 			expander(t_token *token_list, t_env *env_list);
+void            expander(t_token *token_list, t_shell *shell);
 void 			trim_quotes(t_token *token_list);
 void 			free_tokens(t_token **lst);
+void    		free_array(char **arr);
+char    		*find_path(char *cmd, t_env *env);
+char    		**env_list_to_array(t_env *env);
+int     		is_builtin(char *cmd);
+void    		route_child_io(t_cmd *cmd, int fd[2], int prev_fd);
+void    		route_file_redirections(t_cmd *cmd);
+int     		update_parent_pipes(t_cmd *cmd, int fd[2], int prev_fd);
+void    		wait_for_children(t_shell *shell);
+int     		count_args(t_token *start);
+void    		handle_redirections(t_cmd *cmd, t_token **curr);
+void    		handle_heredoc(t_cmd *cmd, t_token **curr, t_shell *shell);
+t_cmd   		*new_cmd(void);
+char    		*expand_heredoc_line(char *line, t_shell *shell);
 
 #endif
