@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 16:03:30 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/01 23:36:54 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/01 23:41:34 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,21 +53,21 @@ int	lexer(char *in, t_token **lst)
 {
 	int	i;
 	int	st;
-	int	q;
+	int	q[2];
 
 	i = -1;
 	st = 0;
-	q = 0;
+	ft_bzero(q, sizeof(int) * 2);
 	while (in[++i])
 	{
-		if (in[i] == '\'' && q != 2)
-			q ^= 1;
-		else if (in[i] == '\"' && q != 1)
-			q ^= 2;
-		else if ((in[i] == ' ' || is_metachar(in[i])) && !q)
+		if (in[i] == '\'' && !q[1])
+			q[0] = !q[0];
+		else if (in[i] == '\"' && !q[0])
+			q[1] = !q[1];
+		else if ((in[i] == ' ' || is_metachar(in[i])) && !q[0] && !q[1])
 			process_delim(in, &i, &st, lst);
 	}
-	if (q)
+	if (q[0] || q[1])
 	{
 		ft_putendl_fd("minishell error: unclosed quotes", 2);
 		return (1);
