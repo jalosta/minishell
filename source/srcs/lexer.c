@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 16:03:30 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/01 18:51:03 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/01 23:36:54 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	lexer(char *in, t_token **lst)
 	}
 	if (q)
 	{
-		ft_putendl_fd("\n", 2);
+		ft_putendl_fd("minishell error: unclosed quotes", 2);
 		return (1);
 	}
 	extract_word(in, st, i, lst);
