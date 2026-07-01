@@ -11,7 +11,8 @@ SRCS        :=  source/srcs/builtins.c source/srcs/env.c source/srcs/executor.c 
                 source/srcs/expander.c source/srcs/free.c source/srcs/lexer.c \
                 source/srcs/heredoc_utils.c source/srcs/quotes.c \
                 source/srcs/executor_utils.c source/srcs/executor_io.c \
-                source/srcs/parser_utils.c source/srcs/parser_heredoc.c
+                source/srcs/parser_utils.c source/srcs/parser_heredoc.c \
+                source/srcs/lexer_utils.c
 LIBFT_DIR	:=	source/srcs/libft
 LIBFT		:=	$(LIBFT_DIR)/libft.a
 

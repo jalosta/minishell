@@ -87,5 +87,9 @@ void    		handle_redirections(t_cmd *cmd, t_token **curr);
 void    		handle_heredoc(t_cmd *cmd, t_token **curr, t_shell *shell);
 t_cmd   		*new_cmd(void);
 char    		*expand_heredoc_line(char *line, t_shell *shell);
+int             is_metachar(char c);
+t_token_type    get_token_type(char *word);
+t_token         *new_token(char *word, t_token_type type);
+void            add_token_back(t_token **lst, t_token *new_node);
 
 #endif

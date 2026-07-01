@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/06/29 21:49:00 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/01 19:20:09 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,29 @@ static void	init_signals(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
+static void	process_input(char *input, t_shell *shell)
+{
+	t_token	*token_list;
+	t_cmd	*cmds;
+
+	add_history(input);
+	token_list = NULL;
+	cmds = NULL;
+	lexer(input, &token_list);
+	expander(token_list, shell);
+	trim_quotes(token_list);
+	cmds = parse_input(token_list, shell);
+	if (cmds != NULL)
+	{
+		execute_cmds(cmds, shell);
+		free_cmds(cmds);
+	}
+	free_tokens(&token_list);
+}
+
 static void	shell_loop(t_shell *shell)
 {
 	char	*input;
-	t_cmd	*cmds;
-	t_token	*token_list;
 
 	while (1)
 	{
@@ -44,21 +62,7 @@ static void	shell_loop(t_shell *shell)
 			break ;
 		}
 		if (*input != '\0')
-		{
-			add_history(input);
-			token_list = NULL;
-			cmds = NULL;
-			lexer(input, &token_list);
-			expander(token_list, shell);
-			trim_quotes(token_list);
-			cmds = parse_input(token_list, shell);
-			if (cmds != NULL)
-			{
-				execute_cmds(cmds, shell);
-				free_cmds(cmds);
-			}
-			free_tokens(&token_list);
-		}
+			process_input(input, shell);
 		free(input);
 	}
 }

@@ -41,7 +41,7 @@ char	*get_env_val(t_env *env, char *key)
 
 void	free_env(t_env *env)
 {
-	t_env *tmp;
+	t_env	*tmp;
 
 	while (env != NULL)
 	{

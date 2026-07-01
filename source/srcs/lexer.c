@@ -6,113 +6,72 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 16:03:30 by synoshah          #+#    #+#             */
-/*   Updated: 2026/06/29 20:25:06 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/01 18:51:03 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_metachar(char c)
+static void	extract_word(char *input, int start, int i, t_token **lst)
 {
-	if (c == '|' || c == '<' || c == '>')
-		return (1);
-	return (0);
-}
-
-t_token_type	get_token_type(char *word)
-{
-	if (ft_strncmp(word, "|", 2) == 0)
-		return (TOKEN_PIPE);
-	if (ft_strncmp(word, "<", 2) == 0)
-		return (TOKEN_REDIR_IN);
-	if (ft_strncmp(word, ">", 2) == 0)
-		return (TOKEN_REDIR_OUT);
-	if (ft_strncmp(word, "<<", 3) == 0)
-		return (TOKEN_HEREDOC);
-	if (ft_strncmp(word, ">>", 3) == 0)
-		return (TOKEN_APPEND);
-	return (TOKEN_WORD);
-}
-
-t_token	*new_token(char *word, t_token_type type)
-{
+	char	*word;
 	t_token	*node;
 
-	node = ft_malloc(sizeof(t_token));
-	node->value = word;
-	node->type = type;
-	node->next = NULL;
-	return (node);
-}
-
-void	add_token_back(t_token **lst, t_token *new_node)
-{
-	t_token	*curr;
-
-	if (*lst == NULL)
+	if (i > start)
 	{
-		*lst = new_node;
-		return ;
+		word = ft_substr(input, start, i - start);
+		node = new_token(word, get_token_type(word));
+		add_token_back(lst, node);
 	}
-	curr = *lst;
-	while (curr->next != NULL)
-		curr = curr->next;
-	curr->next = new_node;
 }
 
-int	lexer(char *input, t_token **token_list)
+static void	handle_metachar(char *input, int *i, t_token **lst)
 {
-	int	in_single;
-	int	in_double;
-	int	i;
-	int	start;
 	char	*word;
-	t_token	*new_node;
+	t_token	*node;
+
+	if (input[*i] == input[*i + 1] && input[*i] != '|')
+	{
+		word = ft_substr(input, *i, 2);
+		(*i)++;
+	}
+	else
+		word = ft_substr(input, *i, 1);
+	node = new_token(word, get_token_type(word));
+	add_token_back(lst, node);
+}
+
+static void	process_delim(char *in, int *i, int *st, t_token **lst)
+{
+	extract_word(in, *st, *i, lst);
+	if (is_metachar(in[*i]))
+		handle_metachar(in, i, lst);
+	*st = *i + 1;
+}
+
+int	lexer(char *in, t_token **lst)
+{
+	int	i;
+	int	st;
+	int	q;
 
 	i = -1;
-	in_double = 0;
-	in_single = 0;
-	start = 0;
-	while (input[++i] != '\0')
+	st = 0;
+	q = 0;
+	while (in[++i])
 	{
-		if (input[i] == '\'' && !in_double)
-			in_single = !in_single;
-		else if (input[i] == '\"' && !in_single)
-			in_double = !in_double;
-		else if ((input[i] == ' ' || is_metachar(input[i]))
-			&& !in_single && !in_double)
-		{
-			if (i > start)
-			{
-				word = ft_substr(input, start, i - start);
-				new_node = new_token(word, get_token_type(word));
-				add_token_back(token_list, new_node);
-			}
-			if (is_metachar(input[i]))
-			{
-				if (input[i] == input[i + 1] && input[i] != '|')
-				{
-					word = ft_substr(input, i, 2);
-					i++;
-				}
-				else
-					word = ft_substr(input, i, 1);
-				new_node = new_token(word, get_token_type(word));
-				add_token_back(token_list, new_node);
-			}
-			start = i + 1;
-		}
+		if (in[i] == '\'' && q != 2)
+			q ^= 1;
+		else if (in[i] == '\"' && q != 1)
+			q ^= 2;
+		else if ((in[i] == ' ' || is_metachar(in[i])) && !q)
+			process_delim(in, &i, &st, lst);
 	}
-	if (in_single || in_double)
+	if (q)
 	{
 		ft_putendl_fd("\n", 2);
 		return (1);
 	}
-	if (i > start)
-	{
-		word = ft_substr(input, start, i - start);
-		new_node = new_token(word, get_token_type(word));
-		add_token_back(token_list, new_node);
-	}
+	extract_word(in, st, i, lst);
 	return (0);
 }
