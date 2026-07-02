@@ -37,3 +37,5 @@ fclean: 		clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
 	$(RM) $(NAME)
 re: 			fclean all
+
+.PHONY: all clean fclean re
