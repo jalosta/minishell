@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/01 23:35:47 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/02 14:13:42 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ static void	process_input(char *input, t_shell *shell)
 	add_history(input);
 	token_list = NULL;
 	cmds = NULL;
-
 	if (lexer(input, &token_list) != 0)
 	{
 		free_tokens(&token_list);
