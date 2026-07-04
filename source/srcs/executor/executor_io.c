@@ -6,11 +6,21 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 14:13:16 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/02 14:13:17 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/04 09:00:46 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	clean_exit(t_cmd *cmd, t_shell *shell, int exit_code)
+{
+	perror("minishell");
+	if (cmd != NULL)
+		free_cmds(cmd);
+	if (shell != NULL && shell->env != NULL)
+		free_env(shell->env);
+	exit(exit_code);
+}
 
 void	route_child_io(t_cmd *cmd, int fd[2], int prev_fd)
 {
@@ -27,7 +37,7 @@ void	route_child_io(t_cmd *cmd, int fd[2], int prev_fd)
 	}
 }
 
-void	route_file_redirections(t_cmd *cmd)
+void	route_file_redirections(t_cmd *cmd, t_shell *shell)
 {
 	int	file_fd;
 
@@ -35,7 +45,7 @@ void	route_file_redirections(t_cmd *cmd)
 	{
 		file_fd = open(cmd->in_file, O_RDONLY);
 		if (file_fd == -1)
-			exit(EXIT_FAILURE);
+			clean_exit(cmd, shell, EXIT_FAILURE);
 		dup2(file_fd, STDIN_FILENO);
 		close(file_fd);
 	}
@@ -46,7 +56,7 @@ void	route_file_redirections(t_cmd *cmd)
 		else
 			file_fd = open(cmd->out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (file_fd == -1)
-			exit(EXIT_FAILURE);
+			clean_exit(cmd, shell, EXIT_FAILURE);
 		dup2(file_fd, STDOUT_FILENO);
 		close(file_fd);
 	}
@@ -64,14 +74,22 @@ int	update_parent_pipes(t_cmd *cmd, int fd[2], int prev_fd)
 	return (-1);
 }
 
-void	wait_for_children(t_shell *shell)
+void	wait_for_children(t_shell *shell, pid_t last_pid)
 {
-	int	status;
+	int		status;
+	int		last_status;
+	pid_t	pid;
 
-	while (waitpid(-1, &status, 0) > 0)
-		;
-	if (WIFEXITED(status))
-		shell->exit_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		shell->exit_status = 128 + WTERMSIG(status);
+	last_status = 0;
+	pid = waitpid(-1, &status, 0);
+	while (pid > 0)
+	{
+		if (pid == last_pid)
+			last_status = status;
+		pid = waitpid(-1, &status, 0);
+	}
+	if (WIFEXITED(last_status))
+		shell->exit_status = WEXITSTATUS(last_status);
+	else if (WIFSIGNALED(last_status))
+		shell->exit_status = 128 + WTERMSIG(last_status);
 }
