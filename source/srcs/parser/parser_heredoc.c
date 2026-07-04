@@ -21,6 +21,7 @@ static int	get_heredoc_fd(char **tmp_name)
 	num = ft_itoa(hd_count++);
 	*tmp_name = ft_strjoin(".heredoc.tmp.", num);
 	free(num);
+	unlink(*tmp_name);
 	fd = open(*tmp_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 	{
