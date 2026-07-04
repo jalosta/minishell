@@ -92,9 +92,10 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 	int		fd[2];
 	int		prev_fd;
 	pid_t	pid;
-
 	if (!cmds || !cmds->args || !cmds->args[0] || cmds->args[0][0] == '\0')
-		return ;
+    	return ;
+	if (g_sig == SIGINT)
+    	return ;
 	if (cmds->next == NULL && is_builtin(cmds->args[0]))
 		return (exec_single_builtin(cmds, shell));
 	prev_fd = -1;
