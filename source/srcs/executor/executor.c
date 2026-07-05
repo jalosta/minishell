@@ -91,24 +91,22 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 	t_cmd	*curr;
 	int		fd[2];
 	int		prev_fd;
-	pid_t	pid;
-	if (!cmds || !cmds->args || !cmds->args[0] || cmds->args[0][0] == '\0')
-    	return ;
+
+	if (!cmds || !cmds->args || !cmds->args[0] || !cmds->args[0][0])
+		return ;
 	if (g_sig == SIGINT)
-    	return ;
-	if (cmds->next == NULL && is_builtin(cmds->args[0]))
+		return ;
+	if (!cmds->next && is_builtin(cmds->args[0]))
 		return (exec_single_builtin(cmds, shell));
 	prev_fd = -1;
 	curr = cmds;
-	while (curr != NULL)
+	while (curr)
 	{
-		if (curr->next != NULL && pipe(fd) == -1)
+		if (curr->next && pipe(fd) == -1)
 			return ;
-		pid = fork();
-		if (pid == 0)
+		if (fork() == 0)
 			execute_child(curr, shell, fd, prev_fd);
-		else
-			prev_fd = update_parent_pipes(curr, fd, prev_fd);
+		prev_fd = update_parent_pipes(curr, fd, prev_fd);
 		curr = curr->next;
 	}
 	wait_for_children(shell);
