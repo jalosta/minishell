@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 16:03:30 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/02 14:11:53 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/06 00:38:13 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ static void	handle_metachar(char *input, int *i, t_token **lst)
 	add_token_back(lst, node);
 }
 
-static void	process_delim(char *in, int *i, int *st, t_token **lst)
+static void	process_delim(char *in, int *i, int *start, t_token **lst)
 {
-	extract_word(in, *st, *i, lst);
+	extract_word(in, *start, *i, lst);
 	if (is_metachar(in[*i]))
 		handle_metachar(in, i, lst);
-	*st = *i + 1;
+	*start = *i + 1;
 }
 
 int	lexer(char *in, t_token **lst)
