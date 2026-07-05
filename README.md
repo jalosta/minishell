@@ -14,7 +14,9 @@ Clean up using *make clean*. To remove the executable, run *make fclean*.
 
 Manuals for readline, execve, fork, pipe, and errno.
 
-Medium articles, Youtube videos, and the Wikipedia breakdown of the Bash architecture.
+Medium articles, Youtube videos, and the Wikipedia breakdown of bash architecture and the read–eval–print loop.
+
+Wikipedia article of Read–eval–print loop
 
 minishell_tester by LucasKuhn on git to test for edge cases.
 
