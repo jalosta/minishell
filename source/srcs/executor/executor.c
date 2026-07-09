@@ -32,7 +32,7 @@ static void	execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	route_child_io(cmd, fd, prev_fd);
-	route_file_redirections(cmd);
+	route_file_redirections(cmd, shell);
 	if (exec_builtin(cmd, shell) == EXIT_SUCCESS)
 		exit(EXIT_SUCCESS);
 	path = find_path(cmd->args[0], shell->env);
@@ -91,6 +91,7 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 	t_cmd	*curr;
 	int		fd[2];
 	int		prev_fd;
+	pid_t	pid;
 
 	if (!cmds || !cmds->args || !cmds->args[0] || !cmds->args[0][0])
 		return ;
@@ -104,11 +105,12 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 	{
 		if (curr->next && pipe(fd) == -1)
 			return ;
-		if (fork() == 0)
+		pid = fork();
+		if (pid == 0)
 			execute_child(curr, shell, fd, prev_fd);
 		prev_fd = update_parent_pipes(curr, fd, prev_fd);
 		curr = curr->next;
 	}
-	wait_for_children(shell);
+	wait_for_children(shell, pid);
 	cleanup_heredocs(cmds);
 }
