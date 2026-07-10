@@ -39,12 +39,16 @@ static void	execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
 	if (path == NULL)
 	{
 		ft_putendl_fd("minishell: command not found", STDERR_FILENO);
+		free_cmds(cmd);
+		free_env(shell->env);
 		exit(EXIT_CMD_NOT_FOUND);
 	}
 	env_arr = env_list_to_array(shell->env);
 	execve(path, cmd->args, env_arr);
 	free_array(env_arr);
 	perror("execve");
+	free_cmds(cmd);
+	free_env(shell->env);
 	exit(EXIT_CMD_CANNOT_EXECUTE);
 }
 
