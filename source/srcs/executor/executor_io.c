@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 14:13:16 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/04 09:00:46 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/11 18:17:28 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,5 +91,11 @@ void	wait_for_children(t_shell *shell, pid_t last_pid)
 	if (WIFEXITED(last_status))
 		shell->exit_status = WEXITSTATUS(last_status);
 	else if (WIFSIGNALED(last_status))
+	{
+		if (WTERMSIG(last_status) == SIGINT)
+			ft_putchar_fd('\n', STDOUT_FILENO);
+		else if (WTERMSIG(last_status) == SIGQUIT)
+			ft_putendl_fd("Quit\n", STDOUT_FILENO);
 		shell->exit_status = 128 + WTERMSIG(last_status);
+	}
 }

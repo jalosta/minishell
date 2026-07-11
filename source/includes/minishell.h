@@ -90,5 +90,6 @@ int				is_metachar(char c);
 t_token_type	get_token_type(char *word);
 t_token			*new_token(char *word, t_token_type type);
 void			add_token_back(t_token **lst, t_token *new_node);
+void			sigint_handler(int sig);
 
 #endif

@@ -24,32 +24,33 @@ int	is_builtin(char *cmd)
 	return (0);
 }
 
-static void	execute_child(t_cmd *cmd, t_shell *shell, int fd[2], int prev_fd)
+static void	execute_child(t_cmd *cmd, t_shell *sh, int fd[2], int p_fd)
 {
 	char	*path;
-	char	**env_arr;
+	char	**env_a;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	route_child_io(cmd, fd, prev_fd);
-	route_file_redirections(cmd, shell);
-	if (exec_builtin(cmd, shell) == EXIT_SUCCESS)
+	route_child_io(cmd, fd, p_fd);
+	route_file_redirections(cmd, sh);
+	if (!cmd->args || !cmd->args[0])
 		exit(EXIT_SUCCESS);
-	path = find_path(cmd->args[0], shell->env);
-	if (path == NULL)
+	if (is_builtin(cmd->args[0]))
+		exit(exec_builtin(cmd, sh));
+	path = find_path(cmd->args[0], sh->env);
+	if (!path)
+		ft_putstr_fd("minishell: command not found\n", 2);
+	else
 	{
-		ft_putendl_fd("minishell: command not found", STDERR_FILENO);
-		free_cmds(cmd);
-		free_env(shell->env);
-		exit(EXIT_CMD_NOT_FOUND);
+		env_a = env_list_to_array(sh->env);
+		execve(path, cmd->args, env_a);
+		free_array(env_a);
+		ft_putstr_fd("minishell: ", 2);
+		perror(cmd->args[0]);
 	}
-	env_arr = env_list_to_array(shell->env);
-	execve(path, cmd->args, env_arr);
-	free_array(env_arr);
-	perror("execve");
 	free_cmds(cmd);
-	free_env(shell->env);
-	exit(EXIT_CMD_CANNOT_EXECUTE);
+	free_env(sh->env);
+	exit(126 + (!path || errno == ENOENT));
 }
 
 static void	exec_single_builtin(t_cmd *cmd, t_shell *shell)
@@ -97,14 +98,13 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 	int		prev_fd;
 	pid_t	pid;
 
-	if (!cmds || !cmds->args || !cmds->args[0] || !cmds->args[0][0])
+	if (!cmds || g_sig == SIGINT)
 		return ;
-	if (g_sig == SIGINT)
-		return ;
-	if (!cmds->next && is_builtin(cmds->args[0]))
+	if (!cmds->next && cmds->args && cmds->args[0] && is_builtin(cmds->args[0]))
 		return (exec_single_builtin(cmds, shell));
 	prev_fd = -1;
 	curr = cmds;
+	signal(SIGINT, SIG_IGN);
 	while (curr)
 	{
 		if (curr->next && pipe(fd) == -1)
@@ -116,5 +116,6 @@ void	execute_cmds(t_cmd *cmds, t_shell *shell)
 		curr = curr->next;
 	}
 	wait_for_children(shell, pid);
+	signal(SIGINT, sigint_handler);
 	cleanup_heredocs(cmds);
 }

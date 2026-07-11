@@ -41,13 +41,18 @@ static char	*get_val_and_len(char *str, int i, t_shell *shell, int *len)
 		return (ft_itoa(shell->exit_status));
 	}
 	*len = 1;
+	if (!str[i + 1] || str[i + 1] == ' ' || str[i + 1] == '\"')
+	{
+		*len = 0;
+		return (ft_strdup("$"));
+	}
 	while (ft_isalnum(str[i + *len]) || str[i + *len] == '_')
 		(*len)++;
 	(*len)--;
 	key = ft_substr(str, i + 1, *len);
 	env_val = get_env_val(shell->env, key);
 	free(key);
-	if (env_val == NULL)
+	if (!env_val)
 		return (ft_strdup(""));
 	return (ft_strdup(env_val));
 }

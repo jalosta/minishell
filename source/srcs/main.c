@@ -6,15 +6,15 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/04 09:09:38 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/11 18:22:17 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			g_sig = 0;
+int	g_sig = 0;
 
-static void	sigint_handler(int sig)
+void	sigint_handler(int sig)
 {
 	g_sig = sig;
 	ft_putchar_fd('\n', STDOUT_FILENO);
@@ -23,10 +23,32 @@ static void	sigint_handler(int sig)
 	rl_redisplay();
 }
 
-static void	init_signals(void)
+static int	check_syntax(t_token *tokens)
 {
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, SIG_IGN);
+	t_token	*curr;
+
+	curr = tokens;
+	while (curr)
+	{
+		if (curr->type == TOKEN_PIPE)
+		{
+			if (curr == tokens || !curr->next || curr->next->type == TOKEN_PIPE)
+			{
+				ft_putendl_fd("minishell: syntax error", 2);
+				return (1);
+			}
+		}
+		else if (curr->type != TOKEN_WORD)
+		{
+			if (!curr->next || curr->next->type != TOKEN_WORD)
+			{
+				ft_putendl_fd("minishell: syntax error", 2);
+				return (1);
+			}
+		}
+		curr = curr->next;
+	}
+	return (0);
 }
 
 static void	process_input(char *input, t_shell *shell)
@@ -34,23 +56,25 @@ static void	process_input(char *input, t_shell *shell)
 	t_token	*token_list;
 	t_cmd	*cmds;
 
+	if (g_sig == SIGINT)
+		g_sig = 0;
 	add_history(input);
 	token_list = NULL;
 	cmds = NULL;
 	if (lexer(input, &token_list) != 0)
+		return ;
+	if (check_syntax(token_list))
 	{
+		shell->exit_status = 258;
 		free_tokens(&token_list);
 		return ;
 	}
 	expander(token_list, shell);
 	trim_quotes(token_list);
 	cmds = parse_input(token_list, shell);
-	if (cmds != NULL)
-	{
-		execute_cmds(cmds, shell);
-		free_cmds(cmds);
-	}
 	free_tokens(&token_list);
+	execute_cmds(cmds, shell);
+	free_cmds(cmds);
 }
 
 static void	shell_loop(t_shell *shell)
@@ -61,10 +85,7 @@ static void	shell_loop(t_shell *shell)
 	{
 		input = readline("minishell$ ");
 		if (input == NULL)
-		{
-			ft_putendl_fd("exit", 2);
 			break ;
-		}
 		if (*input != '\0')
 			process_input(input, shell);
 		free(input);
@@ -79,9 +100,9 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	shell.env = init_env(envp);
 	shell.exit_status = 0;
-	init_signals();
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
 	shell_loop(&shell);
 	free_env(shell.env);
-	ft_putendl_fd("", STDOUT_FILENO);
 	return (0);
 }

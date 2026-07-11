@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 14:13:12 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/02 14:13:13 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/11 18:17:00 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@ char	*find_path(char *cmd, t_env *env)
 	char	**split;
 	char	*exec_path;
 
-	paths = get_env_val(env, "PATH");
-	if (access(cmd, X_OK) == 0)
+	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
+	paths = get_env_val(env, "PATH");
 	if (paths == NULL)
 		return (NULL);
 	split = ft_split(paths, ':');

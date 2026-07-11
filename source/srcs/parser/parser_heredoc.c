@@ -51,27 +51,53 @@ static void	process_heredoc_lines(int fd, char *delim, int exp, t_shell *shell)
 	}
 }
 
+static void	remove_delim_quotes(char *delim, int *exp)
+{
+	*exp = 1;
+	if (delim[0] == '\'' || delim[0] == '\"')
+	{
+		*exp = 0;
+		ft_memmove(delim, delim + 1, ft_strlen(delim));
+		delim[ft_strlen(delim) - 1] = '\0';
+	}
+}
+
+static void	wait_for_heredoc(pid_t pid)
+{
+	int	status;
+
+	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+	{
+		ft_putchar_fd('\n', STDOUT_FILENO);
+		g_sig = SIGINT;
+	}
+}
+
 void	handle_heredoc(t_cmd *cmd, t_token **curr, t_shell *shell)
 {
-	char	*delim;
 	int		fd;
 	int		exp;
+	pid_t	pid;
 
 	*curr = (*curr)->next;
 	if (!*curr || (*curr)->type != TOKEN_WORD)
 		return ;
-	delim = (*curr)->value;
-	exp = 1;
-	if (delim[0] == '\'' || delim[0] == '\"')
-	{
-		exp = 0;
-		ft_memmove(delim, delim + 1, ft_strlen(delim));
-		delim[ft_strlen(delim) - 1] = '\0';
-	}
+	remove_delim_quotes((*curr)->value, &exp);
 	fd = get_heredoc_fd(&cmd->in_file);
 	if (fd == -1)
 		return ;
-	process_heredoc_lines(fd, delim, exp, shell);
+	signal(SIGINT, SIG_IGN);
+	pid = fork();
+	if (pid == 0)
+	{
+		signal(SIGINT, SIG_DFL);
+		process_heredoc_lines(fd, (*curr)->value, exp, shell);
+		close(fd);
+		exit(EXIT_SUCCESS);
+	}
 	close(fd);
+	wait_for_heredoc(pid);
+	signal(SIGINT, sigint_handler);
 	cmd->heredoc = 1;
 }
