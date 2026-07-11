@@ -61,11 +61,7 @@ int	exec_builtin(t_cmd *cmd, t_shell *shell)
 	else if (ft_strncmp(name, "pwd", 4) == EQUAL)
 		exec_pwd(shell);
 	else if (ft_strncmp(name, "exit", 5) == EQUAL)
-	{
-		free_cmds(cmd);
-		free_env(shell->env);
-		exit(shell->exit_status);
-	}
+		exec_exit(cmd, shell);
 	else
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);

@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 20:23:52 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/11 18:22:17 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/12 00:56:22 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,10 @@ static void	shell_loop(t_shell *shell)
 	{
 		input = readline("minishell$ ");
 		if (input == NULL)
+		{
+			ft_putendl_fd("exit", 1);
 			break ;
+		}
 		if (*input != '\0')
 			process_input(input, shell);
 		free(input);

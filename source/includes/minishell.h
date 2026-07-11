@@ -91,5 +91,6 @@ t_token_type	get_token_type(char *word);
 t_token			*new_token(char *word, t_token_type type);
 void			add_token_back(t_token **lst, t_token *new_node);
 void			sigint_handler(int sig);
+void			exec_exit(t_cmd *cmd, t_shell *shell);
 
 #endif
