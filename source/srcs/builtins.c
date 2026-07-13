@@ -2,9 +2,21 @@
 
 static void	exec_cd(t_cmd *cmd, t_shell *shell)
 {
+	char	*target;
+
 	if (cmd->args[1] == NULL)
-		return ;
-	if (chdir(cmd->args[1]) != 0)
+	{
+		target = get_env_val(shell->env, "HOME");
+		if (target == NULL)
+		{
+			ft_putendl_fd("minishell: cd: HOME not set", STDERR_FILENO);
+			shell->exit_status = EXIT_FAILURE;
+			return ;
+		}
+	}
+	else
+		target = cmd->args[1];
+	if (chdir(target) != 0)
 	{
 		perror("minishell: cd");
 		shell->exit_status = EXIT_FAILURE;
