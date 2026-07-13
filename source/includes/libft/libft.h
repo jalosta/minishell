@@ -1,10 +1,10 @@
 #ifndef LIBFT_H
 # define LIBFT_H
 
-# include <limits.h>  // INT_MAX, INT_MIN
-# include <stdbool.h> // boolean
-# include <stdlib.h>  // malloc, free
-# include <unistd.h>  // write
+# include <limits.h>
+# include <stdbool.h>
+# include <stdlib.h>
+# include <unistd.h>
 
 # define EQUAL 0
 # define NEGATIVE -1
