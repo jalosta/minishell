@@ -29,7 +29,7 @@ void	exec_exit(t_cmd *cmd, t_shell *shell)
 		ft_putstr_fd("minishell: exit: ", 2);
 		ft_putstr_fd(cmd->args[1], 2);
 		ft_putendl_fd(": numeric argument required", 2);
-		code = 255;
+		code = 2;
 	}
 	else if (cmd->args[1] && cmd->args[2])
 	{
