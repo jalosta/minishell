@@ -62,8 +62,8 @@ int	exec_builtin(t_cmd *cmd, t_shell *shell)
 		exec_pwd(shell);
 	else if (ft_strncmp(name, "exit", 5) == EQUAL)
 		exec_exit(cmd, shell);
-	else if (ft_strncmp(name, "echo", 5) == EQUAL)
-		exec_echo(cmd, shell);
+	// else if (ft_strncmp(name, "echo", 5) == EQUAL)
+	// 	exec_echo(cmd, shell);
 	else	
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
