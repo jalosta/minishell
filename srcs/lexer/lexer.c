@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*   By: jalosta- <jalosta-@42abudhabi.ae>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 16:03:30 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/06 00:38:13 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/14 16:46:49 by jalosta-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ static void	process_delim(char *in, int *i, int *start, t_token **lst)
 	*start = *i + 1;
 }
 
+#define S_ERR_UNCLOSED_QUOTES "minishell error: unclosed quotes"
+
 int	lexer(char *in, t_token **lst)
 {
 	int	i;
@@ -71,9 +73,9 @@ int	lexer(char *in, t_token **lst)
 	}
 	if (single || doubleq)
 	{
-		ft_putendl_fd("minishell error: unclosed quotes", 2);
-		return (1);
+		ft_putendl_fd(S_ERR_UNCLOSED_QUOTES, 2);
+		return (EXIT_FAILURE);
 	}
 	extract_word(in, st, i, lst);
-	return (0);
+	return (EXIT_SUCCESS);
 }

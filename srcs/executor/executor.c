@@ -12,9 +12,10 @@
 
 #include "minishell.h"
 
-int	is_builtin(char *cmd)
+bool	is_builtin(char *cmd)
 {
 	if (!cmd)
+<<<<<<< HEAD:source/srcs/executor/executor.c
 		return (0);
 	if (ft_strncmp(cmd, "cd", 3) == 0 || ft_strncmp(cmd, "exit", 5) == 0
 		|| ft_strncmp(cmd, "env", 4) == 0 || ft_strncmp(cmd, "pwd", 4) == 0
@@ -23,6 +24,14 @@ int	is_builtin(char *cmd)
 //		|| ft_strncmp(cmd, "echo", 5) == 0)
 		return (1);
 	return (0);
+=======
+		return (EXIT_FAILURE);
+	if (ft_strcmp(cmd, CD) || ft_strcmp(cmd, EXIT) || ft_strcmp(cmd, ENV)
+		|| ft_strcmp(cmd, PWD) || ft_strcmp(cmd, ECHO) || ft_strcmp(cmd, EXPORT)
+		|| ft_strcmp(cmd, UNSET))
+		return (true);
+	return (false);
+>>>>>>> 33b0457 (export, unset):srcs/executor/executor.c
 }
 
 static void	execute_child(t_cmd *cmd, t_shell *sh, int fd[2], int p_fd)
@@ -40,13 +49,13 @@ static void	execute_child(t_cmd *cmd, t_shell *sh, int fd[2], int p_fd)
 		exit(exec_builtin(cmd, sh));
 	path = find_path(cmd->args[0], sh->env);
 	if (!path)
-		ft_putstr_fd("minishell: command not found\n", 2);
+		ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
 	else
 	{
 		env_a = env_list_to_array(sh->env);
 		execve(path, cmd->args, env_a);
 		free_array(env_a);
-		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd->args[0]);
 	}
 	free_cmds(cmd);

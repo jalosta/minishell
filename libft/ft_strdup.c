@@ -4,15 +4,13 @@ char	*ft_strdup(const char *s)
 {
 	char	*dup;
 	int		len;
-
-	if (s == NULL)
+	
+	if (!s)
 		return (NULL);
 	len = ft_strlen(s);
 	dup = malloc(len + 1);
-	if (dup == NULL)
+	if (!dup)
 		return (NULL);
-	dup[len] = '\0';
-	while (len-- > 0)
-		dup[len] = s[len];
+	ft_memcpy(dup, s, len + 1);
 	return (dup);
 }

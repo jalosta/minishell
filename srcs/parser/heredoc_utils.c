@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*   By: jalosta- <jalosta-@42abudhabi.ae>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/02 14:12:06 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/02 14:12:07 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/14 18:11:33 by jalosta-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static char	*safe_strjoin(char *s1, char *s2)
 {
 	char	*new_str;
 
-	if (s2 == NULL)
+	if (!s2)
 		return (s1);
 	new_str = ft_strjoin(s1, s2);
 	free(s1);
@@ -58,7 +58,7 @@ static char	*expand_var(char *line, int *i, t_shell *shell, char *res)
 			(*i)++;
 		v_name = ft_substr(line, start, *i - start);
 		v_val = get_env_val(shell->env, v_name);
-		if (v_val != NULL)
+		if (v_val)
 			res = safe_strjoin(res, v_val);
 		free(v_name);
 	}

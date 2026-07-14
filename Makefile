@@ -1,41 +1,60 @@
 NAME		:=	minishell
 
 CC			:=	cc
-CFLAGS		:=	-Wall -Wextra -Werror
+CFLS		:=	-Wall -Wextra -Werror
+DBUG		:=  -g
 
-INCLUDES	:=	-I source/includes
+INCL		:=	-I includes -I libft
 LIBS		:=	-lreadline
 
-SRCS        :=  source/srcs/builtins.c source/srcs/env.c source/srcs/executor/executor.c \
-                source/srcs/ft_malloc.c source/srcs/parser/parser.c source/srcs/main.c \
-                source/srcs/expander.c source/srcs/free.c source/srcs/lexer/lexer.c \
-                source/srcs/parser/heredoc_utils.c source/srcs/quotes.c \
-                source/srcs/executor/executor_utils.c source/srcs/executor/executor_io.c \
-                source/srcs/parser/parser_utils.c source/srcs/parser/parser_heredoc.c \
-                source/srcs/lexer/lexer_utils.c source/srcs/executor/builtin_exit.c
-LIBFT_DIR	:=	source/srcs/libft
-LIBFT		:=	$(LIBFT_DIR)/libft.a
+SRCF		:=	main.c 						\
+				builtins.c 					\
+				builtins/cd.c 				\
+				builtins/echo.c 			\
+				builtins/env.c 				\
+				builtins/exit.c 			\
+				builtins/export.c 			\
+				builtins/pwd.c 				\
+				builtins/unset.c 			\
+				env.c 						\
+				executor/executor.c 		\
+				executor/executor_utils.c 	\
+				executor/executor_io.c		\
+				expander.c 					\
+				free.c 						\
+				ft_malloc.c 				\
+				lexer/lexer.c 				\
+				lexer/lexer_utils.c 		\
+				parser/parser.c 			\
+				parser/parser_utils.c 		\
+				parser/parser_heredoc.c 	\
+				parser/heredoc_utils.c 		\
+				quotes.c
+SRCP		:=	srcs/
+OBJP		:=	objs/
 
-OBJ_DIR		:=	objs
-OBJS		:=	$(SRCS:%.c=$(OBJ_DIR)/%.o)
+SRCS		:=	$(addprefix $(SRCP), $(SRCF))
+OBJS 		:=	$(addprefix $(OBJP), $(SRCF:.c=.o))
+
+LIBFT		:=	libft
+LIBAR		:=	$(LIBFT)/libft.a
 
 RM			:=	rm -f
 
-all: 			$(NAME)
+all			: 	$(NAME)
 
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
-$(NAME): 		$(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBS) -o $@
-$(OBJ_DIR)/%.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-clean:
-	$(MAKE) -C $(LIBFT_DIR) clean
-	$(RM) -r $(OBJ_DIR)
-fclean: 		clean
-	$(MAKE) -C $(LIBFT_DIR) fclean
+$(NAME)		: 	$(OBJS) $(LIBAR)
+	$(CC) $(CFLS) $(OBJS) $(LIBAR) $(LIBS) -o $@
+$(LIBAR)	:
+	$(MAKE) -C $(LIBFT)
+$(OBJP)		:
+	mkdir -p $@
+$(OBJP)%.o	:	$(SRCP)%.c
+	$(CC) $(CFLS) $(INCL) -c $< -o $@
+clean		:
+	$(MAKE) -C $(LIBFT) clean
+	$(RM) -r $(OBJP)
+fclean		: 	clean
+	$(MAKE) -C $(LIBFT) fclean
 	$(RM) $(NAME)
-re: 			fclean all
-
-.PHONY: all clean fclean re
+re			: 	fclean all
