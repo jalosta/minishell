@@ -1,16 +1,17 @@
 #include "libft.h"
+#define S_NULL "(null)"
 
-int	ft_putstr_fd(const char *s, int fd)
+int	ft_putstr(const char *s)
 {
 	int	count;
 	int	e_check;
 
 	count = 0;
 	if (!s)
-		return (ft_putstr_fd("(null)", fd));
+		return (ft_putstr(S_NULL));
 	while (*s)
 	{
-		e_check = ft_putchar_fd(*s, fd);
+		e_check = ft_putchar(*s);
 		if (e_check == WRITE_FAIL)
 			return (WRITE_FAIL);
 		count += e_check;

@@ -12,43 +12,42 @@
 
 #include "libft.h"
 
-static int	count_digit_places(int n)
+static int	count_digits(int n)
 {
-	int	d;
+	int	len;
 
-	d = 1;
-	while ((n / 10) != 0)
+	len = 0;
+	if (n <= 0)
+		len++;
+	while (n)
 	{
 		n /= 10;
-		d++;
+		len++;
 	}
-	return (d);
+	return (len);
 }
 
 char	*ft_itoa(int n)
 {
-	int		places;
-	char	*nbr;
-	bool	last_place;
+	int		len;
+	char	*str;
 
-	if (n == INT_MIN)
-		return (ft_strdup("-2147483648"));
-	places = count_digit_places(n);
-	last_place = n < 0;
-	places += last_place;
-	nbr = malloc(places + 1);
-	if (nbr == NULL)
+	if (!n)
+		return (ft_strdup("0"));
+	len = count_digits(n);
+	str = malloc(sizeof(char) * (len + 1));
+	if (!str)
 		return (NULL);
-	nbr[places] = '\0';
+	str[len] = '\0';
 	if (n < 0)
 	{
+		str[0] = '-';
 		n = -n;
-		*nbr = '-';
 	}
-	while (places-- > last_place)
+	while (n)
 	{
-		nbr[places] = n % 10 + '0';
+		str[--len] = (n % 10) + '0';
 		n /= 10;
 	}
-	return (nbr);
+	return (str);
 }

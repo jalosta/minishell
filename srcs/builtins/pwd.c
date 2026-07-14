@@ -16,7 +16,7 @@ void	exec_pwd(t_cmd *cmd, t_shell *shell)
 	cwd = getcwd(NULL, 0);
 	if (cwd)
 	{
-		ft_putendl_fd(cwd, 1);
+		ft_putendl(cwd);
 		free(cwd);
 		shell->exit_status = EXIT_SUCCESS;
 	}
