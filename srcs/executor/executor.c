@@ -15,23 +15,13 @@
 bool	is_builtin(char *cmd)
 {
 	if (!cmd)
-<<<<<<< HEAD:source/srcs/executor/executor.c
-		return (0);
-	if (ft_strncmp(cmd, "cd", 3) == 0 || ft_strncmp(cmd, "exit", 5) == 0
-		|| ft_strncmp(cmd, "env", 4) == 0 || ft_strncmp(cmd, "pwd", 4) == 0
-		|| ft_strncmp(cmd, "export", 7) == 0
-		|| ft_strncmp(cmd, "unset", 6) == 0)
-//		|| ft_strncmp(cmd, "echo", 5) == 0)
-		return (1);
-	return (0);
-=======
-		return (EXIT_FAILURE);
-	if (ft_strcmp(cmd, CD) || ft_strcmp(cmd, EXIT) || ft_strcmp(cmd, ENV)
-		|| ft_strcmp(cmd, PWD) || ft_strcmp(cmd, ECHO) || ft_strcmp(cmd, EXPORT)
-		|| ft_strcmp(cmd, UNSET))
+		return (false);
+	if (!ft_strcmp(cmd, CD) || !ft_strcmp(cmd, EXIT) || !ft_strcmp(cmd, ENV)
+		|| !ft_strcmp(cmd, PWD) || !ft_strcmp(cmd, ECHO)
+		|| !ft_strcmp(cmd, EXPORT)
+		|| !ft_strcmp(cmd, UNSET))
 		return (true);
 	return (false);
->>>>>>> 33b0457 (export, unset):srcs/executor/executor.c
 }
 
 static void	execute_child(t_cmd *cmd, t_shell *sh, int fd[2], int p_fd)

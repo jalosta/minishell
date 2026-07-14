@@ -13,20 +13,20 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
- #include "libft.h"
- #include <dirent.h>          	// opendir, readdir, closedir
- #include <errno.h>           	// errno
- #include <fcntl.h>           	// open
- #include <readline/history.h>	// add_history
- #include <readline/readline.h> // readline, rl_*
- #include <signal.h>          	// signal, SIGINT, SIGQUIT, SIG_DFL, SIG_IGN
- #include <stdio.h>           	// perror
- #include <stdlib.h>          	// free, exit, EXIT_SUCCESS, EXIT_FAILURE
- #include <string.h>          	// strerror
- #include <sys/wait.h>        	// wait, waitpid
- #include <unistd.h>          	// access, chdir, close, dup, dup2, execve, ...
+# include "libft.h"
+# include <dirent.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <sys/wait.h>
+# include <unistd.h>
 
-extern int		g_sig;
+extern int	g_sig;
 
 # define EQUAL 0
 # define EXIT_CMD_NOT_FOUND 127
@@ -118,6 +118,7 @@ void			exec_exit(t_cmd *cmd, t_shell *shell);
 void			exec_export(t_cmd *cmd, t_shell *shell);
 void			exec_pwd(t_cmd *cmd, t_shell *shell);
 void			exec_unset(t_cmd *cmd, t_shell *shell);
+void			add_or_update_env(t_shell *shell, char *arg);
 
 // memory
 void			*ft_malloc(size_t size);

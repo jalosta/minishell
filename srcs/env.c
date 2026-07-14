@@ -1,5 +1,27 @@
 #include "minishell.h"
 
+static void	increment_shlvl(t_env *env_list)
+{
+	t_env	*curr;
+	int		lvl;
+
+	curr = env_list;
+	while (curr)
+	{
+		if (!ft_strcmp(curr->key, "SHLVL"))
+		{
+			if (curr->value)
+				lvl = ft_atoi(curr->value) + 1;
+			else
+				lvl = 1;
+			free(curr->value);
+			curr->value = ft_itoa(lvl);
+			return ;
+		}
+		curr = curr->next;
+	}
+}
+
 t_env	*init_env(char **envp)
 {
 	t_env	*head;
@@ -25,6 +47,7 @@ t_env	*init_env(char **envp)
 		head = curr;
 		envp++;
 	}
+	increment_shlvl(head);
 	return (head);
 }
 

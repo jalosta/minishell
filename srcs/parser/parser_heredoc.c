@@ -18,6 +18,8 @@ static int	get_heredoc_fd(char **tmp_name)
 	char		*num;
 	int			fd;
 
+	if (*tmp_name != NULL)
+		free(*tmp_name);
 	num = ft_itoa(hd_count++);
 	*tmp_name = ft_strjoin(".heredoc.tmp.", num);
 	free(num);

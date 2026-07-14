@@ -14,7 +14,7 @@ static bool	is_valid_identifier(char *s)
 	return (true);
 }
 
-static void	add_or_update_env(t_shell *shell, char *arg)
+void	add_or_update_env(t_shell *shell, char *arg)
 {
 	char	*key;
 	char	*value;

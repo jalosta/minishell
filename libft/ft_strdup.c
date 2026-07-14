@@ -4,7 +4,7 @@ char	*ft_strdup(const char *s)
 {
 	char	*dup;
 	int		len;
-	
+
 	if (!s)
 		return (NULL);
 	len = ft_strlen(s);
