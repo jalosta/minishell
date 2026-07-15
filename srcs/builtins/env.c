@@ -17,9 +17,9 @@ void	exec_env(t_cmd *cmd, t_shell *shell)
 	{
 		if (curr->value)
 		{
-			ft_putstr_fd(curr->key, 1);
-			ft_putchar_fd('=', 1);
-			ft_putendl_fd(curr->value, 1);
+			ft_putstr(curr->key);
+			ft_putchar('=');
+			ft_putendl(curr->value);
 		}
 		curr = curr->next;
 	}

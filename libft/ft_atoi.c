@@ -12,27 +12,37 @@
 
 #include "libft.h"
 
+static int	get_sign(char c)
+{
+	if (c == '-')
+		return (NEGATIVE);
+	return (POSITIVE);
+}
+
+static int	char_to_digit(int c)
+{
+	return (c - '0');
+}
+
 int	ft_atoi(const char *nptr)
 {
+	int		sgn;
 	long	nbr;
-	int		sign;
 
-	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\n')
+	while (ft_isspace(*nptr))
 		nptr++;
-	sign = POSITIVE;
 	if (*nptr == '+' || *nptr == '-')
 	{
-		if (*nptr == '-')
-			sign = NEGATIVE;
+		sgn = get_sign(*nptr);
 		nptr++;
 	}
 	nbr = 0;
-	while (*nptr >= '0' && *nptr <= '9')
+	while (ft_isdigit(*nptr))
 	{
-		nbr = nbr * 10 + (*nptr - '0');
-		if ((sign * nbr > INT_MAX) || (sign * nbr < INT_MIN))
+		nbr = nbr * 10 + char_to_digit(*nptr);
+		if (sgn * nbr > INT_MAX || sgn * nbr < INT_MIN)
 			return (EXIT_FAILURE);
 		nptr++;
 	}
-	return (sign * (int)nbr);
+	return (sgn * nbr);
 }

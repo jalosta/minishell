@@ -60,5 +60,10 @@ char				*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char				*ft_substr(char const *s, unsigned int start, size_t len);
 int					ft_tolower(int c);
 int					ft_toupper(int c);
+int					ft_putchar(int c);
+void				ft_putendl(char *s);
+int					ft_putstr(const char *s);
+int					ft_putnbr(int n);
+int					isspace(int c);
 
 #endif
