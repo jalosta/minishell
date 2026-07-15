@@ -1,5 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:10:18 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:21:36 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-#define S_ERR_SYNTAX "minishell: syntax error"
 
 int	g_sig = 0;
 
@@ -66,8 +77,6 @@ static void	process_input(char *input, t_shell *shell)
 	free_cmds(cmds);
 }
 
-#define PROMPT "minishell$ "
-
 static void	shell_loop(t_shell *shell)
 {
 	char	*input;
@@ -77,7 +86,7 @@ static void	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (input == NULL)
 		{
-			ft_putendl_fd(EXIT, 1);
+			ft_putendl_fd("exit", 1);
 			break ;
 		}
 		if (*input)
@@ -90,7 +99,8 @@ int	main(int ac, char **av, char **envp)
 {
 	t_shell	shell;
 
-	(void)(ac, av);
+	(void)ac;
+	(void)av;
 	shell.env = init_env(envp);
 	shell.exit_status = 0;
 	signal(SIGINT, sigint_handler);

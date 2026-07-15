@@ -1,7 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:09:27 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:24:39 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define S_ERR_PWD_ARGS "minishell: pwd: too many arguments"
-#define S_ERR_PWD "minishell: pwd: "
+#include "minishell.h"
 
 void	exec_pwd(t_cmd *cmd, t_shell *shell)
 {

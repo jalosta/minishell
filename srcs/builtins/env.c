@@ -1,6 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:09:33 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:23:16 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define S_ERR_ENV_ARGS "minishell: env: too many arguments"
+#include "minishell.h"
 
 void	exec_env(t_cmd *cmd, t_shell *shell)
 {

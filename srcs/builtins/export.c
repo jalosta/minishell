@@ -1,8 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:09:21 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:24:45 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define S_EXP_FORMAT "declare -x "
-#define S_ERR_EXPORT "minishell: export: `"
-#define S_ERR_EXPORT_ID "': not a valid identifier"
+#include "minishell.h"
 
 static bool	is_valid_identifier(char *s)
 {
@@ -20,7 +28,6 @@ static bool	is_valid_identifier(char *s)
 	return (true);
 }
 
-<<<<<<< HEAD
 void	add_or_update_env(t_shell *shell, char *arg)
 {
 	char	*key;
@@ -61,10 +68,6 @@ void	add_or_update_env(t_shell *shell, char *arg)
 	shell->env = curr;
 }
 
-#define S_EXP_FORMAT "declare -x "
-
-=======
->>>>>>> 24fb5eafa9d302e16b2a6cf4d9f769f887a6f774
 static void	print_export(t_shell *shell)
 {
 	t_env	*curr;
@@ -83,56 +86,6 @@ static void	print_export(t_shell *shell)
 		ft_putstr("\n");
 		curr = curr->next;
 	}
-}
-
-static void	add_new_node(t_shell *shell, char *key, char *eq)
-{
-	t_env	*new_node;
-	t_env	*curr;
-
-	new_node = malloc(sizeof(t_env));
-	if (!new_node)
-		return ;
-	new_node->key = key;
-	new_node->value = NULL;
-	if (eq)
-		new_node->value = ft_strdup(eq + 1);
-	new_node->next = NULL;
-	if (!shell->env)
-	{
-		shell->env = new_node;
-		return ;
-	}
-	curr = shell->env;
-	while (curr->next)
-		curr = curr->next;
-	curr->next = new_node;
-}
-
-static void	add_or_update_env(t_shell *shell, char *arg)
-{
-	char	*eq;
-	char	*key;
-	t_env	*curr;
-
-	eq = ft_strchr(arg, '=');
-	key = ft_strdup(arg);
-	if (eq)
-		key[eq - arg] = '\0';
-	curr = shell->env;
-	while (curr && ft_strcmp(curr->key, key) != 0)
-		curr = curr->next;
-	if (curr)
-	{
-		free(key);
-		if (eq)
-		{
-			free(curr->value);
-			curr->value = ft_strdup(eq + 1);
-		}
-		return ;
-	}
-	add_new_node(shell, key, eq);
 }
 
 void	exec_export(t_cmd *cmd, t_shell *shell)

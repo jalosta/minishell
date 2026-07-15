@@ -28,10 +28,42 @@
 
 extern int	g_sig;
 
+// --- Status Codes & Return Values ---
 # define EQUAL 0
 # define EXIT_CMD_NOT_FOUND 127
 # define EXIT_CMD_CANNOT_EXECUTE 126
 # define SYNTAX_ERROR 258
+# define EXIT_NUM_ARGS 255
+
+// --- Built-in Command Names ---
+# define CD				"cd"
+# define ENV			"env"
+# define PWD			"pwd"
+# define EXIT			"exit"
+# define EXPORT			"export"
+# define UNSET			"unset"
+# define ECHO			"echo"
+
+// --- Shell Prompts & Strings ---
+# define PROMPT			"minishell$ "
+# define K_HOME			"HOME"
+# define K_EXIT			"exit"
+# define ECHO_OPT_N		"-n"
+# define S_EXP_FORMAT	"declare -x "
+
+// --- Error Messages ---
+# define S_ERR_SYNTAX		"minishell: syntax error"
+# define S_ERR_HOME			"minishell: cd: HOME not set"
+# define S_ERR_ARGS			"minishell: cd: too many arguments"
+# define S_ERR_CD			"minishell: cd: "
+# define S_ERR_EXIT			"minishell: exit: "
+# define S_ERR_EXIT_NUMERIC	": numeric argument required"
+# define S_ERR_EXIT_ARGS	"minishell: exit: too many arguments"
+# define S_ERR_ENV_ARGS		"minishell: env: too many arguments"
+# define S_ERR_EXPORT		"minishell: export: `"
+# define S_ERR_EXPORT_ID	"': not a valid identifier"
+# define S_ERR_PWD_ARGS		"minishell: pwd: too many arguments"
+# define S_ERR_PWD			"minishell: pwd: "
 
 typedef struct s_env
 {

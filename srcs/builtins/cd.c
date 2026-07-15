@@ -1,8 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cd.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:09:38 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:22:13 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define K_HOME	"HOME"
-#define S_ERR_HOME "minishell: cd: HOME not set"
-#define S_ERR_ARGS "minishell: cd: too many arguments"
+#include "minishell.h"
 
 static char	*get_cd_path(t_cmd *cmd, t_shell *shell)
 {
@@ -27,8 +35,6 @@ static char	*get_cd_path(t_cmd *cmd, t_shell *shell)
 	}
 	return (cmd->args[1]);
 }
-
-#define S_ERR_CD	"minishell: cd: "
 
 static void	update_pwd_vars(t_shell *shell, char *old_path)
 {

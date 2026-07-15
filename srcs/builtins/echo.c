@@ -1,6 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   echo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/15 14:09:35 by synoshah          #+#    #+#             */
+/*   Updated: 2026/07/15 14:26:07 by synoshah         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define ECHO_OPT_N "-n"
+#include "minishell.h"
 
 void	exec_echo(t_cmd *cmd, t_shell *shell)
 {
@@ -8,10 +18,10 @@ void	exec_echo(t_cmd *cmd, t_shell *shell)
 	bool	nl;
 
 	i = 1;
-	nl = TRUE;
+	nl = true;
 	while (cmd->args[i] && !ft_strcmp(cmd->args[i], ECHO_OPT_N))
 	{
-		nl = FALSE;
+		nl = false;
 		i++;
 	}
 	while (cmd->args[i])
