@@ -6,7 +6,7 @@ int	g_sig = 0;
 void	sigint_handler(int sig)
 {
 	g_sig = sig;
-	ft_putchar_fd('\n', 1);
+	ft_putchar('\n');
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
@@ -77,7 +77,7 @@ static void	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (input == NULL)
 		{
-			ft_putendl_fd(EXIT, 1);
+			ft_putendl("exit");
 			break ;
 		}
 		if (*input)
@@ -90,7 +90,8 @@ int	main(int ac, char **av, char **envp)
 {
 	t_shell	shell;
 
-	(void)(ac, av);
+	(void)ac;
+	(void)av;
 	shell.env = init_env(envp);
 	shell.exit_status = 0;
 	signal(SIGINT, sigint_handler);

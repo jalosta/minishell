@@ -64,7 +64,7 @@ static void	add_new_node(t_shell *shell, char *key, char *eq)
 	curr->next = new_node;
 }
 
-static void	add_or_update_env(t_shell *shell, char *arg)
+void	add_or_update_env(t_shell *shell, char *arg)
 {
 	char	*eq;
 	char	*key;

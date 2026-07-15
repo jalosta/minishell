@@ -12,11 +12,19 @@
 
 #include "minishell.h"
 
+#define CD "cd"
+#define EXIT "exit"
+#define ENV "env"
+#define PWD "pwd"
+#define ECHO "echo"
+#define EXPORT "export"
+#define UNSET "unset"
+
 bool	is_builtin(char *cmd)
 {
-	if (ft_strcmp(cmd, CD) || ft_strcmp(cmd, EXIT) || ft_strcmp(cmd, ENV)
-		|| ft_strcmp(cmd, PWD) || ft_strcmp(cmd, ECHO) || ft_strcmp(cmd, EXPORT)
-		|| ft_strcmp(cmd, UNSET))
+	if (!ft_strcmp(cmd, CD) || !ft_strcmp(cmd, EXIT) || !ft_strcmp(cmd, ENV)
+		|| !ft_strcmp(cmd, PWD) || !ft_strcmp(cmd, ECHO) || !ft_strcmp(cmd, EXPORT)
+		|| !ft_strcmp(cmd, UNSET))
 		return (true);
 	return (false);
 }

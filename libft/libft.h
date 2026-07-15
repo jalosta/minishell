@@ -64,6 +64,6 @@ int					ft_putchar(int c);
 void				ft_putendl(char *s);
 int					ft_putstr(const char *s);
 int					ft_putnbr(int n);
-int					isspace(int c);
+int					ft_isspace(int c);
 
 #endif

@@ -32,7 +32,7 @@ void	exec_exit(t_cmd *cmd, t_shell *shell)
 		ft_putstr_fd(S_ERR_EXIT, 2);
 		ft_putstr_fd(cmd->args[1], 2);
 		ft_putendl_fd(S_ERR_EXIT_NUMERIC, 2);
-		code = EXIT_NUM_ARG_REQ;
+		code = EXIT_NUM_ARGS;
 	}
 	else if (cmd->args[1] && cmd->args[2])
 	{

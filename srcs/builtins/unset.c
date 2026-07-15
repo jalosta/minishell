@@ -1,5 +1,24 @@
 #include "minishell.h"
 
+#define S_ERR_UNSET "minishell: unset: `"
+#define S_ERR_UNSET_ID "': not a valid identifier"
+
+static bool	is_valid_identifier(char *s)
+{
+	int	i;
+
+	if (!ft_isalpha(s[0]) && s[0] != '_')
+		return (false);
+	i = 1;
+	while (s[i])
+	{
+		if (!ft_isalnum(s[i]) && s[i] != '_')
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
 static void	free_env_node(t_env *node)
 {
 	free(node->key);
@@ -35,10 +54,18 @@ void	exec_unset(t_cmd *cmd, t_shell *shell)
 	int	i;
 
 	i = 1;
+	shell->exit_status = EXIT_SUCCESS;
 	while (cmd->args[i])
 	{
-		remove_env_var(shell, cmd->args[i]);
+		if (!is_valid_identifier(cmd->args[i]))
+		{
+			ft_putstr_fd(S_ERR_UNSET, 2);
+			ft_putstr_fd(cmd->args[i], 2);
+			ft_putendl_fd(S_ERR_UNSET_ID, 2);
+			shell->exit_status = EXIT_FAILURE;
+		}
+		else
+			remove_env_var(shell, cmd->args[i]);
 		i++;
 	}
-	shell->exit_status = EXIT_SUCCESS;
 }

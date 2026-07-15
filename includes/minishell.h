@@ -116,6 +116,7 @@ void			exec_echo(t_cmd *cmd, t_shell *shell);
 void			exec_env(t_cmd *cmd, t_shell *shell);
 void			exec_exit(t_cmd *cmd, t_shell *shell);
 void			exec_export(t_cmd *cmd, t_shell *shell);
+void			add_or_update_env(t_shell *shell, char *arg);
 void			exec_pwd(t_cmd *cmd, t_shell *shell);
 void			exec_unset(t_cmd *cmd, t_shell *shell);
 

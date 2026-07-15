@@ -33,16 +33,32 @@ static char	*get_cd_path(t_cmd *cmd, t_shell *shell)
 void	exec_cd(t_cmd *cmd, t_shell *shell)
 {
 	char	*path;
+	char	*old_pwd;
+	char	new_pwd[PATH_MAX];
+	char	*arg;
 
 	path = get_cd_path(cmd, shell);
 	if (!path)
 		return ;
-	if (chdir(path) != 0)
+	old_pwd = get_env_val(shell->env, "PWD");
+	if (chdir(path) == -1)
 	{
 		ft_putstr_fd(S_ERR_CD, 2);
 		perror(path);
 		shell->exit_status = EXIT_FAILURE;
 	}
 	else
+	{
+		if (old_pwd)
+		{
+			arg = ft_strjoin("OLDPWD=", old_pwd);
+			add_or_update_env(shell, arg);
+			free(arg);
+		}
+		getcwd(new_pwd, PATH_MAX);
+		arg = ft_strjoin("PWD=", new_pwd);
+		add_or_update_env(shell, arg);
+		free(arg);
 		shell->exit_status = EXIT_SUCCESS;
+	}
 }

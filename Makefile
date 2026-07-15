@@ -43,13 +43,12 @@ RM			:=	rm -f
 
 all			: 	$(NAME)
 
-$(NAME)		: 	$(OBJS) $(LIBAR)
-	$(CC) $(CFLS) $(OBJS) $(LIBAR) $(LIBS) -o $@
 $(LIBAR)	:
 	$(MAKE) -C $(LIBFT)
-$(OBJP)		:
-	mkdir -p $@
+$(NAME)		: 	$(OBJS) $(LIBAR)
+	$(CC) $(CFLS) $(OBJS) $(LIBAR) $(LIBS) -o $@
 $(OBJP)%.o	:	$(SRCP)%.c
+	mkdir -p $(dir $@)
 	$(CC) $(CFLS) $(INCL) -c $< -o $@
 clean		:
 	$(MAKE) -C $(LIBFT) clean

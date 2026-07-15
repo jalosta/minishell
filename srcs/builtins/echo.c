@@ -2,16 +2,32 @@
 
 #define ECHO_OPT_N "-n"
 
+static bool	is_n(char *arg)
+{
+	int	i;
+
+	if (arg[0] != '-' || arg[1] != 'n')
+		return (false);
+	i = 2;
+	while (arg[i])
+	{
+		if (arg[i] != 'n')
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
 void	exec_echo(t_cmd *cmd, t_shell *shell)
 {
 	int		i;
 	bool	nl;
 
 	i = 1;
-	nl = TRUE;
-	while (cmd->args[i] && !ft_strcmp(cmd->args[i], ECHO_OPT_N))
+	nl = true;
+	while (cmd->args[i] && is_n(cmd->args[i]))
 	{
-		nl = FALSE;
+		nl = false;
 		i++;
 	}
 	while (cmd->args[i])
