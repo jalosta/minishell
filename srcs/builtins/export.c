@@ -6,7 +6,7 @@
 /*   By: synoshah <synoshah@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 14:09:21 by synoshah          #+#    #+#             */
-/*   Updated: 2026/07/15 14:24:45 by synoshah         ###   ########.fr       */
+/*   Updated: 2026/07/15 14:51:18 by synoshah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,24 +28,10 @@ static bool	is_valid_identifier(char *s)
 	return (true);
 }
 
-void	add_or_update_env(t_shell *shell, char *arg)
+static int	update_existing_env(t_shell *shell, char *key, char *value)
 {
-	char	*key;
-	char	*value;
-	char	*equal_sign;
 	t_env	*curr;
 
-	equal_sign = ft_strchr(arg, '=');
-	if (equal_sign)
-	{
-		key = ft_substr(arg, 0, equal_sign - arg);
-		value = ft_strdup(equal_sign + 1);
-	}
-	else
-	{
-		key = ft_strdup(arg);
-		value = NULL;
-	}
 	curr = shell->env;
 	while (curr)
 	{
@@ -57,15 +43,38 @@ void	add_or_update_env(t_shell *shell, char *arg)
 				curr->value = value;
 			}
 			free(key);
-			return ;
+			return (1);
 		}
 		curr = curr->next;
 	}
-	curr = ft_malloc(sizeof(t_env));
-	curr->key = key;
-	curr->value = value;
-	curr->next = shell->env;
-	shell->env = curr;
+	return (0);
+}
+
+void	add_or_update_env(t_shell *shell, char *arg)
+{
+	char	*key;
+	char	*val;
+	char	*eq;
+	t_env	*new;
+
+	eq = ft_strchr(arg, '=');
+	if (eq)
+	{
+		key = ft_substr(arg, 0, eq - arg);
+		val = ft_strdup(eq + 1);
+	}
+	else
+	{
+		key = ft_strdup(arg);
+		val = NULL;
+	}
+	if (update_existing_env(shell, key, val))
+		return ;
+	new = ft_malloc(sizeof(t_env));
+	new->key = key;
+	new->value = val;
+	new->next = shell->env;
+	shell->env = new;
 }
 
 static void	print_export(t_shell *shell)
